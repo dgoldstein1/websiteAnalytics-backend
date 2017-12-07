@@ -4,15 +4,12 @@ import (
     "fmt"
     "net/http"
     "os"
+    "log"
 )
 
 func main() {
-    http.HandleFunc("/", hello)
-    fmt.Println("listening...")
-    err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
-    if err != nil {
-      panic(err)
-    }
+    router := NewRouter(true)
+    log.Fatal(http.ListenAndServe(":" + os.Getenv("PORT"), router))
 }
 
 func hello(res http.ResponseWriter, req *http.Request) {
