@@ -5,10 +5,15 @@ import (
     "net/http"
     "os"
     "log"
+    "strconv"
 )
 
 func main() {
-    router := NewRouter(true)
+    loggerOn, _ := strconv.ParseBool(os.Getenv("LOGGER"))
+    router := NewRouter(loggerOn)
+
+    fmt.Println("Serving on port " + os.Getenv("PORT"))
+
     log.Fatal(http.ListenAndServe(":" + os.Getenv("PORT"), router))
 }
 
