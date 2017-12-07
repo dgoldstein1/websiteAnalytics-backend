@@ -1,0 +1,6 @@
+{
+	"ImportPath": "github.com/dgoldstein1/websiteMetrics",
+	"GoVersion": "go1.9",
+	"GodepVersion": "v79",
+	"Deps": []
+}
