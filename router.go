@@ -16,19 +16,18 @@ func NewRouter(loggerOn bool) *mux.Router {
 
   router := mux.NewRouter().StrictSlash(true)
   for _, route := range routes {
-    var handler http.Handler
+	var handler http.Handler
 
-    handler = route.HandlerFunc
+	handler = route.HandlerFunc
 
-    if loggerOn {handler = Logger(handler, route.Name)}
+	if loggerOn {handler = RequestLogger(handler, route.Name)}
 
-    router.
-      Methods(route.Method).
-      Path(route.Pattern).
-      Name(route.Name).
-      Handler(handler)
+	router.
+	  Methods(route.Method).
+	  Path(route.Pattern).
+	  Name(route.Name).
+	  Handler(handler)
   }
-
   return router
 }
 
@@ -47,28 +46,28 @@ type Routes []Route
 
 var routes = Routes{
   Route{
-    "show all site visits",
-    "GET",
-    "/",
-    getAllVisits,
+	"show all site visits",
+	"GET",
+	"/",
+	getAllVisits,
   },
   Route{
-    "show all site visits",
-    "GET",
-    "/visits",
-    getAllVisits,
+	"show all site visits",
+	"GET",
+	"/visits",
+	getAllVisits,
   },
   Route{
-    "post a new visit",
-    "POST",
-    "/visits",
-    addVisit,
+	"post a new visit",
+	"POST",
+	"/visits",
+	addVisit,
   },
   Route{
-    "show visits by IP address",
-    "GET",
-    "/visits/{ip}",
-    showByIp,
+	"show visits by IP address",
+	"GET",
+	"/visits/{ip}",
+	showByIp,
   },
 }
 
@@ -81,7 +80,8 @@ var routes = Routes{
  * TODO
  **/
 func getAllVisits(w http.ResponseWriter, r *http.Request) {
-  w.Write([]byte("GET /visits"))
+  s := readAllRows()
+  w.Write([]byte("GET /visits" + s))
   w.WriteHeader(http.StatusOK)
 }
 

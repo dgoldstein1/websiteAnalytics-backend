@@ -16,7 +16,3 @@ func main() {
 
     log.Fatal(http.ListenAndServe(":" + os.Getenv("PORT"), router))
 }
-
-func hello(res http.ResponseWriter, req *http.Request) {
-    fmt.Fprintln(res, "hello, world")
-}
