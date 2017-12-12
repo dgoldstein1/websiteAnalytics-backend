@@ -6,6 +6,8 @@ import (
     "time"
     "database/sql"
     _ "github.com/lib/pq"
+    "log"
+    "os"
 )
 
 /**
@@ -13,6 +15,19 @@ import (
  **/
 
  var db *sql.DB
+
+/**
+ * initializes sql db
+ **/
+func openDB() bool {
+    var err error
+    db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
+    if err != nil {
+        log.Fatalf("Error opening database: %q", err)
+        return false
+    }
+    return true
+}
 
 /**
  * reads all rows from DB

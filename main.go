@@ -5,14 +5,24 @@ import (
     "net/http"
     "os"
     "log"
-    "strconv"
+    "github.com/gin-gonic/gin"
+    _ "github.com/lib/pq"
 )
 
 func main() {
-    loggerOn, _ := strconv.ParseBool(os.Getenv("LOGGER"))
-    router := NewRouter(loggerOn)
-
     fmt.Println("Serving on port " + os.Getenv("PORT"))
+
+    // openDB()
+    router := gin.Default()
+    router.Use(gin.Logger())
+
+    // declare routes
+    router.GET("/", getAllVisits)
+    router.GET("/visits", getAllVisits)
+    router.POST("visits", addVisit)
+    router.GET("/visits/:ip",showByIp)
+
+
 
     log.Fatal(http.ListenAndServe(":" + os.Getenv("PORT"), router))
 }
