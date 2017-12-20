@@ -9,9 +9,9 @@ import (
 // HANDLERS //
 //////////////
 
-type Person struct {
-	Name    string `form:"name" json:"name"`
-	Address string `form:"address" json:"address"`
+type Food struct {
+	Name      string `json:"name"`
+	Id        int    `json:"id"`
 }
 
 /**
@@ -19,7 +19,9 @@ type Person struct {
  * TODO
  **/
 func getAllVisits(c *gin.Context) {
-	c.String(http.StatusOK, readAllRows())
+	values := getValues()
+	c.String(http.StatusOK, string(values[:]))
+
 }
 
 /**
@@ -27,9 +29,9 @@ func getAllVisits(c *gin.Context) {
  * TODO
  **/
 func addVisit(c *gin.Context) {
-	var person Person
-	if c.BindJSON(&person) == nil {
-		c.JSON(200, person)
+	var food Food
+	if c.BindJSON(&food) == nil {
+		c.JSON(http.StatusOK, food)
 	}
 }
 

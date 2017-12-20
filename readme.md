@@ -17,6 +17,10 @@ Get dependencies and build
 go install
 ```
 
+Install posgresSQL locally : http://postgresapp.com, and start a local database. Initialize the db from the postgres app.
+
+
+
 Serve locally
 
 ```sh

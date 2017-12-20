@@ -1,59 +1,103 @@
-//dbActions.go
-
 package main
 
 import (
+    "encoding/json"
+    "fmt"   
+    "github.com/boltdb/bolt"
     "time"
-    "database/sql"
-    _ "github.com/lib/pq"
-    "log"
-    "os"
+    "strconv"
 )
 
-/**
- * does db actions. Called by handlers when requests are made
- **/
+type server struct {
+    db *bolt.DB
+}
 
- var db *sql.DB
+var s server
+var currId int
 
-/**
- * initializes sql db
- **/
-func openDB() bool {
+func newRepo(dbfile string) bool{
     var err error
-    db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
+    // s = &server{}
+    s.db, err = bolt.Open(dbfile, 0600, &bolt.Options{Timeout: 1 * time.Second})
     if err != nil {
-        log.Fatalf("Error opening database: %q", err)
         return false
     }
+    s.db.View(func(tx *bolt.Tx) error {
+        b := tx.Bucket([]byte("foods"))
+        if b == nil {
+            currId = 0
+        } else {
+            currId = b.Stats().KeyN - 1
+        }
+        return nil
+    })
     return true
 }
 
-/**
- * reads all rows from DB
- * @return {String} encoded string
- **/
-func readAllRows() string {
-    if _, err := db.Exec("CREATE TABLE IF NOT EXISTS ticks (tick timestamp)"); err != nil {
-        return "Error creating database table"
-    }
-
-    if _, err := db.Exec("INSERT INTO ticks VALUES (now())"); err != nil {
-        return "INSERT INTO ticks VALUES (now())"
-    }
-
-    rows, err := db.Query("SELECT tick FROM ticks")
-    if err != nil {
-        return "Error reading ticks"
-    }
-
-    defer rows.Close()
-    for rows.Next() {
-        var tick time.Time
-        if err := rows.Scan(&tick); err != nil {
-            return "Error scanning ticks"
+func addValue(key string) error{
+    var id = []byte(strconv.Itoa(currId))
+    currId++
+    
+    return s.db.Update(func(tx *bolt.Tx) error {
+        b, err := tx.CreateBucketIfNotExists([]byte("foods"))
+        if err != nil {
+            return err
         }
-        return tick.String()
-    }
-    return ""
+        return b.Put(id, []byte(key));
+    })
+
 }
+func getById(key string) (ct string, data []byte, err error) {
+    s.db.View(func(tx *bolt.Tx) error {
+        b := tx.Bucket([]byte("foods"))
+        if (b==nil){
+            return nil
+        }
+        r := b.Get([]byte(key))
+        if r != nil {
+            data = make([]byte, len(r))
+            copy(data, r)
+        }
+
+        r = b.Get([]byte(fmt.Sprintf("%s-ContentType", key)))
+        ct = string(r)
+        return nil
+    })
+    return
+}
+
+/**
+ * gets all current values
+ * @return {[]byte} json encoded byte array, list of objects
+ **/
+func getValues() []byte {
+
+    // create slice of foods
+    foodArray := []Food{}
+    s.db.View(func(tx *bolt.Tx) error {
+        b := tx.Bucket([]byte("foods"))
+
+        // nothing posted yet
+        if b==nil {
+            return nil
+        }
+
+        // loop through table to create array of all datapoints
+        b.ForEach(func(id, name []byte) error {
+
+            // read in byte stream to food object
+            idAsInt, _ := strconv.Atoi(string(id))
+            f := Food{string(name), idAsInt}
+
+            // add it to the slice of foods
+            foodArray = append(foodArray, f)
+
+      return nil
+    })
+        return nil
+    })
+
+    temp , _ := json.Marshal(foodArray)
+    return temp
+}
+
