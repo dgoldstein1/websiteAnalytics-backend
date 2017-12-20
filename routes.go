@@ -9,9 +9,9 @@ import (
 // HANDLERS //
 //////////////
 
-type Food struct {
-	Name      string `json:"name"`
-	Id        int    `json:"id"`
+type Visit struct {
+	ip      string `json:"ip"`
+	location string    `json:"location"`
 }
 
 /**
@@ -29,9 +29,9 @@ func getAllVisits(c *gin.Context) {
  * TODO
  **/
 func addVisit(c *gin.Context) {
-	var food Food
-	if c.BindJSON(&food) == nil {
-		c.JSON(http.StatusOK, food)
+	var visit Visit
+	if c.BindJSON(&visit) == nil {
+		c.JSON(http.StatusOK, visit)
 	}
 }
 

@@ -23,7 +23,7 @@ func newRepo(dbfile string) bool{
         return false
     }
     s.db.View(func(tx *bolt.Tx) error {
-        b := tx.Bucket([]byte("foods"))
+        b := tx.Bucket([]byte("visits"))
         if b == nil {
             currId = 0
         } else {
@@ -39,7 +39,7 @@ func addValue(key string) error{
     currId++
     
     return s.db.Update(func(tx *bolt.Tx) error {
-        b, err := tx.CreateBucketIfNotExists([]byte("foods"))
+        b, err := tx.CreateBucketIfNotExists([]byte("visits"))
         if err != nil {
             return err
         }
@@ -49,7 +49,7 @@ func addValue(key string) error{
 }
 func getById(key string) (ct string, data []byte, err error) {
     s.db.View(func(tx *bolt.Tx) error {
-        b := tx.Bucket([]byte("foods"))
+        b := tx.Bucket([]byte("visits"))
         if (b==nil){
             return nil
         }
@@ -72,10 +72,10 @@ func getById(key string) (ct string, data []byte, err error) {
  **/
 func getValues() []byte {
 
-    // create slice of foods
-    foodArray := []Food{}
+    // create slice of visits
+    visits := []Visit{}
     s.db.View(func(tx *bolt.Tx) error {
-        b := tx.Bucket([]byte("foods"))
+        b := tx.Bucket([]byte("visits"))
 
         // nothing posted yet
         if b==nil {
@@ -83,21 +83,20 @@ func getValues() []byte {
         }
 
         // loop through table to create array of all datapoints
-        b.ForEach(func(id, name []byte) error {
+        b.ForEach(func(ip, location []byte) error {
 
-            // read in byte stream to food object
-            idAsInt, _ := strconv.Atoi(string(id))
-            f := Food{string(name), idAsInt}
+            // read in byte stream to visits object
+            v := Visit{string(location), string(ip)}
 
             // add it to the slice of foods
-            foodArray = append(foodArray, f)
+            visits = append(visits, v)
 
       return nil
     })
         return nil
     })
 
-    temp , _ := json.Marshal(foodArray)
+    temp , _ := json.Marshal(visits)
     return temp
 }
 
