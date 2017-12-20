@@ -12,7 +12,7 @@ import (
 func main() {
     fmt.Println("Serving on port " + os.Getenv("PORT"))
 
-    // openDB()
+    openDB()
     router := gin.Default()
     router.Use(gin.Logger())
 
@@ -21,8 +21,6 @@ func main() {
     router.GET("/visits", getAllVisits)
     router.POST("visits", addVisit)
     router.GET("/visits/:ip",showByIp)
-
-
 
     log.Fatal(http.ListenAndServe(":" + os.Getenv("PORT"), router))
 }

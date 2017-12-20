@@ -19,7 +19,7 @@ type Person struct {
  * TODO
  **/
 func getAllVisits(c *gin.Context) {
-	c.String(http.StatusOK, "All visits")
+	c.String(http.StatusOK, readAllRows())
 }
 
 /**
