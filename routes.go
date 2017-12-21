@@ -1,17 +1,18 @@
 package main
 
 import (
-  "net/http"
   "github.com/gin-gonic/gin"
+  "net/http"
 )
 
 //////////////
 // HANDLERS //
 //////////////
 
+
 type Visit struct {
-	ip      string `json:"ip"`
-	location string    `json:"location"`
+	IpAddress     string `form:"ipAddress" json:"ipAddress" binding:"required"`
+	Location string `form:"location" json:"location" binding:"required"`
 }
 
 /**
@@ -19,9 +20,8 @@ type Visit struct {
  * TODO
  **/
 func getAllVisits(c *gin.Context) {
-	values := getValues()
+	values := readAllRows()
 	c.String(http.StatusOK, string(values[:]))
-
 }
 
 /**
@@ -29,10 +29,12 @@ func getAllVisits(c *gin.Context) {
  * TODO
  **/
 func addVisit(c *gin.Context) {
-	var visit Visit
-	if c.BindJSON(&visit) == nil {
-		c.JSON(http.StatusOK, visit)
-	}
+	// var json Visit
+	// if err := c.ShouldBindJSON(&json); err == nil {
+	// 	c.JSON(200, json)
+	// } else {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// }
 }
 
 /**
@@ -40,8 +42,8 @@ func addVisit(c *gin.Context) {
  * TODO
  **/
 func showByIp(c *gin.Context) {
-	ip := c.Param("ip")
-	c.String(http.StatusOK, "Get visit by %s", ip)
+	// ip := c.Param("ip")
+	// c.String(http.StatusOK, "Get visit by %s", ip)
 }
 
 
