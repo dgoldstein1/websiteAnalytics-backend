@@ -17,7 +17,7 @@ type Visit struct {
 
 // same as visit, but added timestamp (after insert into DB)
 type VisitEntry struct {
-	Data Visit
+	Data string
 	Timestamp string
 }
 
