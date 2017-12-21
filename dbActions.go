@@ -31,25 +31,41 @@ func newRepo(dbfile string) bool{
 }
 
 func readAllRows() []byte {
-    visits := []Visit{}
+    visitEntries := []VisitEntry{}
     // view transaction
     s.db.View(func(tx *bolt.Tx) error {
         // get bucket with for visits
         b := tx.Bucket([]byte("visits"))
         // loop through table to create array
-        b.ForEach(func(ip, location []byte) error {
+        b.ForEach(func(timestamp, data []byte) error {
             // read in byte stream to visits object
-            v := Visit{string(location), string(ip)}
+            ve := VisitEntry{string(data), string(timestamp)}
             // add it to the slice of foods
-            visits = append(visits, v)
+            visitEntries = append(visitEntries, ve)
             return nil
         })
         return nil
     })
 
     // cast to json
-    temp , _ := json.Marshal(visits)
+    temp , _ := json.Marshal(visitEntries)
     return temp
+}
+
+func insertRow(visit Visit) (Visit, error) {
+    // start an update transaction
+    err := s.db.Update(func(tx *bolt.Tx) error {
+        // retrieve the visits bucket
+        b := tx.Bucket([]byte("visits"))
+        // generate id
+        buf, err := json.Marshal(visit)
+        if (err != nil) {
+            return err
+        }
+        // Persist bytes to bucket
+        return b.Put([]byte(time.Now().Format(time.RFC3339)), buf)
+    })
+    return visit, err
 }
 
 // func addValue(key string) error{

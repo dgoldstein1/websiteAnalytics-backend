@@ -15,9 +15,14 @@ type Visit struct {
 	Location string `form:"location" json:"location" binding:"required"`
 }
 
+// same as visit, but added timestamp (after insert into DB)
+type VisitEntry struct {
+	Data Visit
+	Timestamp string
+}
+
 /**
  * writes list of all site visits
- * TODO
  **/
 func getAllVisits(c *gin.Context) {
 	values := readAllRows()
@@ -29,12 +34,17 @@ func getAllVisits(c *gin.Context) {
  * TODO
  **/
 func addVisit(c *gin.Context) {
-	// var json Visit
-	// if err := c.ShouldBindJSON(&json); err == nil {
-	// 	c.JSON(200, json)
-	// } else {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	// }
+	var in Visit
+	if err := c.ShouldBindJSON(&in); err == nil {
+		out, insertErr := insertRow(in)
+		if (insertErr!=nil) {
+				c.String(500, insertErr.Error())
+			} else {
+				c.JSON(200, out)
+			}
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
 }
 
 /**
