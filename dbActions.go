@@ -1,4 +1,11 @@
+// dbActions.go
+
 package main
+
+/**
+ * Created by David Goldstein 12/2017
+ * manages interactions with bolt db
+ **/
 
 import (
     "github.com/boltdb/bolt"
@@ -6,6 +13,7 @@ import (
     "encoding/json"
 )
 
+// database to use
 type server struct {
     db *bolt.DB
 }
@@ -13,6 +21,12 @@ type server struct {
 var s server
 var currId int
 
+/**
+ * initializes db
+ * @param {string} name of local db file in root directory
+ * of this project
+ * @return {bool} success
+ **/
 func newRepo(dbfile string) bool{
     var err error
     // s = &server{}
@@ -30,6 +44,10 @@ func newRepo(dbfile string) bool{
     return true
 }
 
+/**
+ * reads all rows
+ * @return {[]byte} array of visits
+ **/
 func readAllRows() []byte {
     visitEntries := []VisitEntry{}
     // view transaction
@@ -52,6 +70,11 @@ func readAllRows() []byte {
     return temp
 }
 
+/**
+ * adds an entry into the data
+ * @param {json} visit to append to "visits" bucket
+ * @return {json} visit, error
+ **/
 func insertRow(visit Visit) (Visit, error) {
     // start an update transaction
     err := s.db.Update(func(tx *bolt.Tx) error {
@@ -66,6 +89,36 @@ func insertRow(visit Visit) (Visit, error) {
         return b.Put([]byte(time.Now().Format(time.RFC3339)), buf)
     })
     return visit, err
+}
+
+/**
+ * retrieves all visits from a specific ip address
+ * @param {string} ip address
+ * @return {[]byte} array of visits
+ **/
+func readByIp(ip string) ([]byte, error) {
+    visitEntries := []VisitEntry{}
+    s.db.View(func(tx *bolt.Tx) error {
+        // get bucket with for visits
+        b := tx.Bucket([]byte("visits"))
+        // loop through table to create array
+        b.ForEach(func(timestamp, data []byte) error {
+            // conv []byte => json for visit
+            v := Visit{}
+            json.Unmarshal(data, &v)
+            // if IPs match, add to response
+            if (v.IpAddress == ip) {
+                // read in byte stream to visits object
+                ve := VisitEntry{string(data), string(timestamp)}
+                // add it to the slice of foods
+                visitEntries = append(visitEntries, ve)
+            }
+            return nil
+        })
+        return nil
+    })
+
+    return json.Marshal(visitEntries)
 }
 
 // func addValue(key string) error{

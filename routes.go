@@ -1,4 +1,11 @@
+// routes.go
+
 package main
+
+/**
+ * Created by David Goldstein 12/2017
+ * route handlers
+ **/
 
 import (
   "github.com/gin-gonic/gin"
@@ -9,7 +16,7 @@ import (
 // HANDLERS //
 //////////////
 
-
+// what a user uses to POST
 type Visit struct {
 	IpAddress     string `form:"ipAddress" json:"ipAddress" binding:"required"`
 	Location string `form:"location" json:"location" binding:"required"`
@@ -30,8 +37,7 @@ func getAllVisits(c *gin.Context) {
 }
 
 /**
- * Adds a visit to the postgres DB
- * TODO
+ * Add a visit to the db
  **/
 func addVisit(c *gin.Context) {
 	var in Visit
@@ -49,11 +55,15 @@ func addVisit(c *gin.Context) {
 
 /**
  * writes list of all site visits
- * TODO
  **/
 func showByIp(c *gin.Context) {
-	// ip := c.Param("ip")
-	// c.String(http.StatusOK, "Get visit by %s", ip)
+	ip := c.Param("ip")
+	values, err := readByIp(ip)
+	if (err != nil) {
+		c.String(500, err.Error())
+	} else {
+		c.String(http.StatusOK, string(values[:]))
+	}
 }
 
 
