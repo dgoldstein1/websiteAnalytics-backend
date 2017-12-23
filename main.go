@@ -19,7 +19,7 @@ func main() {
     router.GET("/", getAllVisits)
     router.GET("/visits", getAllVisits)
     router.POST("visits", addVisit)
-    router.GET("/visits/:ip",showByIp)
+    router.GET("/visits/ip/:ip",showByIp)
 
     newRepo("bolt.db")
 
