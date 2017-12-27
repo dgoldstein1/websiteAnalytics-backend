@@ -15,8 +15,14 @@ log_success_or_failure() {
         echo "--- FAILURE --- ${1}"
     fi
 }
+# add authorization to all test scripts
+chmod +x test/visits/run_test.sh
+chmod +x test/visits-post/run_test.sh
 
 # testing queries to / and /visits
-chmod +x test/visits/run_test.sh
 test/visits/run_test.sh ${1}
 log_success_or_failure "retrieve all visits"
+
+# post a new visit
+test/visits-post/run_test.sh ${1}
+log_success_or_failure "add a new visit"
