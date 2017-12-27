@@ -1,14 +1,15 @@
 # run_test.sh
 
+local_location="test/visits"
+
 # init
-cd test/visits
-> output
+> "${local_location}/output"
 
 # make a call to / and /visits and log the output
-curl -s "http://localhost:${1}/visits" >> output
-curl -s "http://localhost:${1}/" >> output
+curl -s "http://localhost:${1}/visits" >> "${local_location}/output"
+curl -s "http://localhost:${1}/" >> "${local_location}/output"
 
-if cmp -s "output" "expected_output"
+if cmp -s "${local_location}/output" "${local_location}/expected_output"
 then
     exit 0
 else

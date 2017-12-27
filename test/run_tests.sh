@@ -20,5 +20,3 @@ log_success_or_failure() {
 chmod +x test/visits/run_test.sh
 test/visits/run_test.sh ${1}
 log_success_or_failure "retrieve all visits"
-
-
