@@ -46,9 +46,12 @@ func newRepo(dbfile string) bool{
 
 /**
  * reads all rows
+ * @param {string} ip filter
+ * @param {int} to date (0 = now)
+ * @param {int} from date (-7 = ) seven days ago
  * @return {[]byte} array of visits
  **/
-func readAllRows() []byte {
+func readAllRows(ip string, to int, from int) ([]byte, error) {
     visitEntries := []VisitEntry{}
     // view transaction
     s.db.View(func(tx *bolt.Tx) error {
@@ -56,18 +59,55 @@ func readAllRows() []byte {
         b := tx.Bucket([]byte("visits"))
         // loop through table to create array
         b.ForEach(func(timestamp, data []byte) error {
-            // read in byte stream to visits object
+            // conv []byte => json for visit
+            v := Visit{}
+            json.Unmarshal(data, &v)
             ve := VisitEntry{string(data), string(timestamp)}
-            // add it to the slice of foods
+            // check equal to passed ip
+            if (ip != NO_INPUT && v.IpAddress != ip) {
+                return nil
+            }
+            // if timestamp is before the 'from' date, return
+            if (from != NO_INPUT_INT && compareRFC3339(string(timestamp[:]), from) == "before") {
+                return nil
+            }
+            // if timestamp is after the 'to'date, return
+            if (to != NO_INPUT_INT && compareRFC3339(string(timestamp[:]), to) == "after") {
+                return nil
+            }
+            // if pases all conditions, add to valid entries
             visitEntries = append(visitEntries, ve)
+            // marshal data into 
             return nil
         })
         return nil
     })
-
     // cast to json
-    temp , _ := json.Marshal(visitEntries)
-    return temp
+    return json.Marshal(visitEntries)
+}
+
+/**
+ * compares two RFC3339 date strings
+ * @param {string} date
+ * @param {int} number of 'days ago' i.e (-7 = seven days ago)
+ * @return {string} "before" "after" "equal" or "error"
+ **/
+func compareRFC3339(timestamp string, daysAgo int) string {
+    // parse as RFC3339
+    aConv, aErr := time.Parse(time.RFC3339, timestamp)
+    if (aErr != nil) {
+        return "error"
+    }
+    bConv, _ := time.Parse(time.RFC3339, time.Now().AddDate(0, 0, daysAgo).Format(time.RFC3339))
+
+    // compare times
+    if (aConv.Before(bConv)) {
+        return "before"
+    }
+    if (aConv.After(bConv)) {
+        return "after"
+    }
+    return "equal"
 }
 
 /**

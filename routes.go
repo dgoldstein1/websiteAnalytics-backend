@@ -10,6 +10,7 @@ package main
 import (
   "github.com/gin-gonic/gin"
   "net/http"
+  "strconv"
 )
 
 //////////////
@@ -28,12 +29,39 @@ type VisitEntry struct {
 	Timestamp string
 }
 
+// utilts -- use MAX_INT for nil as int
+const (
+	NO_INPUT = "9223372036854775807"
+	NO_INPUT_INT = 9223372036854775807
+) 
+
+
 /**
  * writes list of all site visits
  **/
 func getAllVisits(c *gin.Context) {
-	values := readAllRows()
-	c.String(http.StatusOK, string(values[:]))
+	// query string parameters. Default is last month
+	from := c.DefaultQuery("from", NO_INPUT)
+	to := c.DefaultQuery("to", NO_INPUT)
+	ip := c.DefaultQuery("ip", NO_INPUT)
+	// cast to ints
+	fromInt, fromErr := strconv.Atoi(from)
+	toInt, toErr := strconv.Atoi(to)
+	// validate inputs
+	if (fromErr != nil || toErr != nil) {
+		c.String(http.StatusBadRequest, "Bad input " + to + " " + from)
+	} else if (fromInt > toInt) {
+		c.String(http.StatusBadRequest, "The from date cannot be greater that the to date: input : " + to + " - " + from)
+	}
+	// good input, process results
+	else {
+		values, err := readAllRows(ip, toInt, fromInt)
+		if (err == nil ) {
+			c.String(http.StatusOK, string(values[:]))
+		} else {
+			c.String(500, err.Error())
+		}
+	}
 }
 
 /**
