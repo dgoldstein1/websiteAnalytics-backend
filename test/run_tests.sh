@@ -19,6 +19,7 @@ log_success_or_failure() {
 chmod +x test/visits/run_test.sh
 chmod +x test/visits-post/run_test.sh
 chmod +x test/visits-ip/run_test.sh
+chmod +x test/visits-filters/run_test.sh
 
 # testing queries to / and /visits
 test/visits/run_test.sh ${1}
@@ -32,3 +33,6 @@ log_success_or_failure "add a new visit"
 test/visits-ip/run_test.sh ${1}
 log_success_or_failure "get visit by ip"
 
+# get by filter
+test/visits-filters/run_test.sh ${1}
+log_success_or_failure "filter by date"
