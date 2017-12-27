@@ -52,9 +52,7 @@ func getAllVisits(c *gin.Context) {
 		c.String(http.StatusBadRequest, "Bad input " + to + " " + from)
 	} else if (fromInt > toInt) {
 		c.String(http.StatusBadRequest, "The from date cannot be greater that the to date: input : " + to + " - " + from)
-	}
-	// good input, process results
-	else {
+	} else { // input is good, read data
 		values, err := readAllRows(ip, toInt, fromInt)
 		if (err == nil ) {
 			c.String(http.StatusOK, string(values[:]))

@@ -27,7 +27,7 @@ var currId int
  * of this project
  * @return {bool} success
  **/
-func newRepo(dbfile string) bool{
+func newRepo(dbfile string) bool {
     var err error
     // s = &server{}
     s.db, err = bolt.Open(dbfile, 0600, &bolt.Options{Timeout: 1 * time.Second})
