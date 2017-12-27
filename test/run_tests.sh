@@ -18,6 +18,7 @@ log_success_or_failure() {
 # add authorization to all test scripts
 chmod +x test/visits/run_test.sh
 chmod +x test/visits-post/run_test.sh
+chmod +x test/visits-ip/run_test.sh
 
 # testing queries to / and /visits
 test/visits/run_test.sh ${1}
@@ -26,3 +27,8 @@ log_success_or_failure "retrieve all visits"
 # post a new visit
 test/visits-post/run_test.sh ${1}
 log_success_or_failure "add a new visit"
+
+# get by ip
+test/visits-ip/run_test.sh ${1}
+log_success_or_failure "get visit by ip"
+
