@@ -6,6 +6,7 @@ cd test/visits
 
 # make a call to / and /visits and log the output
 curl -s "http://localhost:${1}/visits" >> output
+curl -s "http://localhost:${1}/" >> output
 
 if cmp -s "output" "expected_output"
 then
