@@ -1105,13 +1105,15 @@ body .markdown-body
 #]
 </code></pre></p>
 <h1 id="development"><a name="user-content-development" href="#development" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Development</h1>
-<p>Serve locally</p>
+<p>To setup heroku, follow <a href="https://devcenter.heroku.com/articles/getting-started-with-go#set-up">the heroku setup guide</a> to install the cli and login. Then, setup the project with <code>go</code>:<br />
+<pre><code class="sh">go get github.com/dgoldstein1/websiteAnalytics-backend
+cd $GOPATH/src/github.com/dgoldstein1/websiteAnalytics-backend
+</code></pre><br />
+Install dependencies and launch the project locally.<br />
 <pre><code class="sh">go install
-heroku login
 heroku local
-</code></pre>
-
-<p>The app should run on <a href="http://localhost:5000">http://localhost:5000</a></p>
+</code></pre></p>
+<p>The app should now be running on <a href="http://localhost:5000">http://localhost:5000</a></p>
 <h1 id="testing"><a name="user-content-testing" href="#testing" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Testing</h1>
 <p>Each endpoint is tested using a suite of integration tests. They can be executed by running the following commands from the root directory of the project:</p>
 <pre><code class="sh">test/launchTestServer.sh {port number}

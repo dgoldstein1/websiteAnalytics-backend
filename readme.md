@@ -66,17 +66,22 @@ curl "http://localhost:5000/visits?ip=123.456.789.1&to=-1&from=-365"
 
 # Development
 
-Serve locally
+### Setup
 
+To setup heroku, follow [the heroku setup guide](https://devcenter.heroku.com/articles/getting-started-with-go#set-up) to install the cli and login. Then, setup the project with `go`:
+```sh
+go get github.com/dgoldstein1/websiteAnalytics-backend
+cd $GOPATH/src/github.com/dgoldstein1/websiteAnalytics-backend
+```
+Install dependencies and launch the project locally.
 ```sh
 go install
-heroku login
 heroku local
 ```
 
-The app should run on http://localhost:5000
+The app should now be running on http://localhost:5000
 
-# Testing
+### Testing
 
 Each endpoint is tested using a suite of integration tests. They can be executed by running the following commands from the root directory of the project:
 
@@ -89,3 +94,20 @@ test/run_tests.sh {port number}
 You should see several `--- SUCCESS ---` messages outputted to your terminal.
 
 *Note - to rerun tests, you must restart the test server i.e. `test/launchTestServer.sh {port number}`*
+
+### Deployment
+
+Create a new heroku app and push your code to it
+```sh
+heroku create
+git push heroku master
+```
+To see your app in action run `heroku open`.
+
+## Authors
+
+* **David Goldstein**
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
