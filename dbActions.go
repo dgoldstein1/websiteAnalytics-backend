@@ -46,6 +46,7 @@ func connectToDb(uri string) bool {
  * @return {[]byte} array of visits
  **/
 func readAllRows(ip string, to int, from int) ([]byte, error) {
+    // TODO add to and from 
     visits := []Visit{}
     err := collection.Find(nil).Sort("-visit_date").All(&visits)
     if (err != nil) {
@@ -53,30 +54,6 @@ func readAllRows(ip string, to int, from int) ([]byte, error) {
     }
     // marshal data and return
     return json.Marshal(visits)
-}
-
-/**
- * compares two RFC3339 date strings
- * @param {string} date
- * @param {int} number of 'days ago' i.e (-7 = seven days ago)
- * @return {string} "before" "after" "equal" or "error"
- **/
-func compareRFC3339(timestamp string, daysAgo int) string {
-    // parse as RFC3339
-    aConv, aErr := time.Parse(time.RFC3339, timestamp)
-    if (aErr != nil) {
-        return "error"
-    }
-    bConv, _ := time.Parse(time.RFC3339, time.Now().AddDate(0, 0, daysAgo).Format(time.RFC3339))
-
-    // compare times
-    if (aConv.Before(bConv)) {
-        return "before"
-    }
-    if (aConv.After(bConv)) {
-        return "after"
-    }
-    return "equal"
 }
 
 /**
@@ -101,9 +78,5 @@ func insertRow(visit Visit) (Visit, error) {
 func readByIp(ip string) ([]byte, error) {
     // TODO
     visits := []Visit{}
-    err := collection.Find(bson.M{ "ip" : ip }).Sort("-visit_date").All(&visits)
-    if (err != nil) {
-        return nil, err
-    }
     return json.Marshal(visits)
 }
