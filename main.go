@@ -5,19 +5,23 @@ import (
     "net/http"
     "os"
     "github.com/gin-gonic/gin"
-    _ "github.com/lib/pq"
+    "time"
 )
 
 // what a user uses to POST
 type Visit struct {
-    IpAddress     string `form:"ipAddress" json:"ipAddress" binding:"required"`
-    Location string `form:"location" json:"location" binding:"required"`
-}
-
-// same as visit, but added timestamp (after insert into DB)
-type VisitEntry struct {
-    Data string
-    Timestamp string
+    Ip              string `form:"ip" json:"ip" binding:"required"`
+    City            string `form:"city" json:"city" binding:"required"`
+    Country_Code    string `form:"country_code" json:"country_code"`
+    Country_Name    string `form:"country_name" json:"country_name"`
+    Latitude        float32 `form:"latitude" json:"latitude"`
+    Longitude       float32 `form:"longitude" json:"longitude"`
+    Metro_Code      int `form:"metro_code" json:"metro_code"`
+    Region_Code     string `form:"region_code" json:"region_code"`
+    Time_Zone       string `form:"time_zone" json:"time_zone"`
+    Zip_Code        string `form:"zip_code" json:"zip_code"`
+    // added when inserted into db, passing this in POST does not do anything
+    Visit_Date      time.Time `form:"visit_date" json:"visit_date"` // RFC3339 date string
 }
 
 // utilts -- use MAX_INT for nil as int
@@ -27,8 +31,19 @@ const (
 ) 
 
 func main() {
-    fmt.Println("Serving on port " + os.Getenv("PORT"))
+    // connect to db
+    uri := os.Getenv("DATABASE_URL")
+    if uri == "" {
+        fmt.Println("no environment variable DATABASE_URL provided, exiting.")
+        os.Exit(1)
+    }
+    connectionSuccess := connectToDb(uri)
+    if connectionSuccess == false {
+        fmt.Println("Could not connect to db, exiting")
+        os.Exit(1)
+    }
 
+    // set up routing
     router := gin.Default()
     router.Use(gin.Logger())
 
@@ -38,7 +53,6 @@ func main() {
     router.POST("visits", addVisit)
     router.GET("/visits/ip/:ip",showByIp)
 
-    newRepo("bolt.db")
-
+    fmt.Println("Serving on port " + os.Getenv("PORT"))
     http.ListenAndServe(":" + os.Getenv("PORT"), router)
 }

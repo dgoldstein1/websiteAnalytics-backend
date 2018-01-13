@@ -16,10 +16,17 @@ log_success_or_failure() {
     fi
 }
 # add authorization to all test scripts
+chmod +x test/injectData.sh
 chmod +x test/visits/run_test.sh
 chmod +x test/visits-post/run_test.sh
 chmod +x test/visits-ip/run_test.sh
 chmod +x test/visits-filters/run_test.sh
+
+# inject test data
+test/injectData.sh ${1}
+
+# wait one second for the test data to load
+sleep 1
 
 # testing queries to / and /visits
 test/visits/run_test.sh ${1}
@@ -29,10 +36,10 @@ log_success_or_failure "retrieve all visits"
 test/visits-post/run_test.sh ${1}
 log_success_or_failure "add a new visit"
 
-# get by ip
-test/visits-ip/run_test.sh ${1}
-log_success_or_failure "get visit by ip"
+# # get by ip
+# test/visits-ip/run_test.sh ${1}
+# log_success_or_failure "get visit by ip"
 
-# get by filter
-test/visits-filters/run_test.sh ${1}
-log_success_or_failure "filter by date"
+# # get by filter
+# test/visits-filters/run_test.sh ${1}
+# log_success_or_failure "filter by date"

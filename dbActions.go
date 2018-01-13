@@ -4,44 +4,38 @@ package main
 
 /**
  * Created by David Goldstein 12/2017
- * manages interactions with bolt db
+ * manages interactions with mongo db
  **/
 
 import (
-    "github.com/boltdb/bolt"
     "time"
     "encoding/json"
+    "gopkg.in/mgo.v2"
+    "gopkg.in/mgo.v2/bson"
+    "fmt"
+    "os"
 )
 
-// database to use
-type server struct {
-    db *bolt.DB
-}
-
-var s server
 var currId int
+var collection *mgo.Collection
+var testMode string
 
 /**
  * initializes db
- * @param {string} name of local db file in root directory
- * of this project
+ * @param {string} mongo db name to connect to, i.e 'mmongodb://localhost/visits'
  * @return {bool} success
  **/
-func newRepo(dbfile string) bool {
-    var err error
-    // s = &server{}
-    s.db, err = bolt.Open(dbfile, 0600, &bolt.Options{Timeout: 1 * time.Second})
-    if err != nil {
-        return false
+func connectToDb(uri string) bool {
+    testMode = os.Getenv("TEST_MODE")
+    sess, err := mgo.Dial(uri)
+    if (err != nil) {
+            fmt.Printf("Can't connect to mongo, go error %v\n", err)
+            return false;
     }
-    err = s.db.Update(func(tx *bolt.Tx) error {
-        _, err := tx.CreateBucketIfNotExists([]byte("visits"))
-        if err != nil {
-            return err
-        }
-        return nil
-    })
-    return true
+    sess.SetSafe(&mgo.Safe{})
+    // database = visits, collection = visits
+    collection = sess.DB("visits").C("visits")
+    return true;
 }
 
 /**
@@ -52,38 +46,13 @@ func newRepo(dbfile string) bool {
  * @return {[]byte} array of visits
  **/
 func readAllRows(ip string, to int, from int) ([]byte, error) {
-    visitEntries := []VisitEntry{}
-    // view transaction
-    s.db.View(func(tx *bolt.Tx) error {
-        // get bucket with for visits
-        b := tx.Bucket([]byte("visits"))
-        // loop through table to create array
-        b.ForEach(func(timestamp, data []byte) error {
-            // conv []byte => json for visit
-            v := Visit{}
-            json.Unmarshal(data, &v)
-            ve := VisitEntry{string(data), string(timestamp)}
-            // check equal to passed ip
-            if (ip != NO_INPUT && v.IpAddress != ip) {
-                return nil
-            }
-            // if timestamp is before the 'from' date, return
-            if (from != NO_INPUT_INT && compareRFC3339(string(timestamp[:]), from) == "before") {
-                return nil
-            }
-            // if timestamp is after the 'to'date, return
-            if (to != NO_INPUT_INT && compareRFC3339(string(timestamp[:]), to) == "after") {
-                return nil
-            }
-            // if pases all conditions, add to valid entries
-            visitEntries = append(visitEntries, ve)
-            // marshal data into 
-            return nil
-        })
-        return nil
-    })
-    // cast to json
-    return json.Marshal(visitEntries)
+    visits := []Visit{}
+    err := collection.Find(nil).Sort("-visit_date").All(&visits)
+    if (err != nil) {
+        return nil, err
+    }
+    // marshal data and return
+    return json.Marshal(visits)
 }
 
 /**
@@ -116,18 +85,11 @@ func compareRFC3339(timestamp string, daysAgo int) string {
  * @return {json} visit, error
  **/
 func insertRow(visit Visit) (Visit, error) {
-    // start an update transaction
-    err := s.db.Update(func(tx *bolt.Tx) error {
-        // retrieve the visits bucket
-        b := tx.Bucket([]byte("visits"))
-        // generate id
-        buf, err := json.Marshal(visit)
-        if (err != nil) {
-            return err
-        }
-        // Persist bytes to bucket
-        return b.Put([]byte(time.Now().Format(time.RFC3339)), buf)
-    })
+    if (testMode != "true") { // do not add date for test mode in order to have static data
+        t := time.Now()
+        visit.Visit_Date = t
+    }
+    err := collection.Insert(visit)
     return visit, err
 }
 
@@ -137,25 +99,11 @@ func insertRow(visit Visit) (Visit, error) {
  * @return {[]byte} array of visits
  **/
 func readByIp(ip string) ([]byte, error) {
-    visitEntries := []VisitEntry{}
-    s.db.View(func(tx *bolt.Tx) error {
-        // get bucket with for visits
-        b := tx.Bucket([]byte("visits"))
-        // loop through table to create array
-        b.ForEach(func(timestamp, data []byte) error {
-            // conv []byte => json for visit
-            v := Visit{}
-            json.Unmarshal(data, &v)
-            // if IPs match, add to response
-            if (v.IpAddress == ip) {
-                // read in byte stream to visits object
-                ve := VisitEntry{string(data), string(timestamp)}
-                // add it to the slice of foods
-                visitEntries = append(visitEntries, ve)
-            }
-            return nil
-        })
-        return nil
-    })
-    return json.Marshal(visitEntries)
+    // TODO
+    visits := []Visit{}
+    err := collection.Find(bson.M{ "ip" : ip }).Sort("-visit_date").All(&visits)
+    if (err != nil) {
+        return nil, err
+    }
+    return json.Marshal(visits)
 }
