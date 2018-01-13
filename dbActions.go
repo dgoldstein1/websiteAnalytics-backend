@@ -3,7 +3,7 @@
 package main
 
 /**
- * Created by David Goldstein 12/2017
+ * Created by David Goldstein 12/2017 
  * manages interactions with mongo db
  **/
 
