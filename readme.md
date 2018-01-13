@@ -68,6 +68,19 @@ curl "http://localhost:5000/visits?ip=123.456.789.1&to=-1&from=-365"
 
 ### Setup
 
+#### MongoDB
+ 
+To start a local instance of mongo, download and install the [command line interface](https://docs.mongodb.com/manual/installation/). Then run the following commands to get the db up and running locally:
+
+```sh
+mongod # start the service
+mongo  # in a new tab, connect and start mongo
+use visits # create 'visits' db
+```
+
+
+#### Heroku 
+
 To setup heroku, follow [the heroku setup guide](https://devcenter.heroku.com/articles/getting-started-with-go#set-up) to install the cli and login. Then, setup the project with `go`:
 ```sh
 go get github.com/dgoldstein1/websiteAnalytics-backend
