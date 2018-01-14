@@ -11,7 +11,7 @@ import (
 // what a user uses to POST
 type Visit struct {
     Ip              string `form:"ip" json:"ip" binding:"required"`
-    City            string `form:"city" json:"city" binding:"required"`
+    City            string `form:"city" json:"city"`
     Country_Code    string `form:"country_code" json:"country_code"`
     Country_Name    string `form:"country_name" json:"country_name"`
     Latitude        float32 `form:"latitude" json:"latitude"`
