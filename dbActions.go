@@ -33,7 +33,7 @@ func connectToDb(uri string) bool {
     }
     sess.SetSafe(&mgo.Safe{})
     // database = visits, collection = visits
-    collection = sess.DB("visits").C("visits")
+    collection = sess.DB("websitevisits").C("visits")
     return true;
 }
 
