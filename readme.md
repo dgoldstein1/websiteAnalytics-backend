@@ -1,6 +1,6 @@
-# DavidWebsiteBackend
+# websiteAnalytics-backend
 
-A RESTful Go backend to track website visits. Each website visit contains a) the ip address of the user b) geographical information about that ip address (i.e. lat-lon, city, zipcode) and c) the date the user visited the website. The stack consists of a Go app deployed through heroku, and a [bolt.db](https://github.com/boltdb/bolt) database deployed on the server. Heroku deployment is simple and bolt db makes requests fast and gets rid of the need for additional querying through sql. 
+A RESTful Go backend to track website visits. Each website visit contains a) the ip address of the user b) geographical information about that ip address (i.e. lat-lon, city, zipcode) and c) the date the user visited the website. The stack consists of a Go app deployed through heroku, and a [mongo db](www.mongodb.com) database. Heroku deployment is simple and mongo makes requests fast and gets rid of the need for additional querying through sql. 
 
 # Routes
 

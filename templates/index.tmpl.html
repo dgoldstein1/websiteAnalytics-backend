@@ -1014,8 +1014,8 @@ body .markdown-body
     page-break-after: avoid;
   }
 }
-</style><title>readme</title></head><body><article class="markdown-body"><h1 id="davidwebsitebackend"><a name="user-content-davidwebsitebackend" href="#davidwebsitebackend" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>DavidWebsiteBackend</h1>
-<p>A RESTful Go backend to track website visits. Each website visit contains a) the ip address of the user b) geographical information about that ip address (i.e. lat-lon, city, zipcode) and c) the date the user visited the website. The stack consists of a Go app deployed through heroku, and a <a href="https://github.com/boltdb/bolt">bolt.db</a> database deployed on the server. Heroku deployment is simple and bolt db makes requests fast and gets rid of the need for additional querying through sql. </p>
+</style><title>readme</title></head><body><article class="markdown-body"><h1 id="websiteanalytics-backend"><a name="user-content-websiteanalytics-backend" href="#websiteanalytics-backend" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>websiteAnalytics-backend</h1>
+<p>A RESTful Go backend to track website visits. Each website visit contains a) the ip address of the user b) geographical information about that ip address (i.e. lat-lon, city, zipcode) and c) the date the user visited the website. The stack consists of a Go app deployed through heroku, and a <a href="www.mongodb.com">mongo db</a> database. Heroku deployment is simple and mongo makes requests fast and gets rid of the need for additional querying through sql. </p>
 <h1 id="routes"><a name="user-content-routes" href="#routes" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Routes</h1>
 <h3 id="visits"><a name="user-content-visits" href="#visits" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>/visits</h3>
 <table>

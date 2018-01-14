@@ -7,7 +7,6 @@ local_location="test/visits"
 
 # make a call to / and /visits and log the output
 curl -s "http://localhost:${1}/visits" >> "${local_location}/output"
-curl -s "http://localhost:${1}/" >> "${local_location}/output"
 
 if cmp -s "${local_location}/output" "${local_location}/expected_output"
 then

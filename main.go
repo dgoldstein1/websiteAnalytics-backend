@@ -47,8 +47,15 @@ func main() {
     router := gin.Default()
     router.Use(gin.Logger())
 
-    // declare routes
-    router.GET("/", getAllVisits)
+    // set base page as readme html
+    router.LoadHTMLGlob("templates/*.tmpl.html")
+    router.Static("/static", "static")
+
+    router.GET("/", func(c *gin.Context) {
+        c.HTML(http.StatusOK, "index.tmpl.html", nil)
+    })
+
+    // initialize REST routes
     router.GET("/visits", getAllVisits)
     router.POST("visits", addVisit)
     router.GET("/visits/ip/:ip",showByIp)
