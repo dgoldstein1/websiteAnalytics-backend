@@ -1,1 +1,1 @@
-web: websiteMetrics
+web: go-getting-started
