@@ -1,0 +1,22 @@
+version: '2'
+services:
+  server:
+    build: .
+    environment:
+      - LOGGER=true
+      - TEST_MODE=true
+      - DATABASE_URL=mongodb://mongodb:27018/websitevisits'
+      - PORT=5000
+    # volumes:
+    #   - '.:/go/src/github.com/dgoldstein1/websiteAnalytics-backend'
+    ports:
+      - '5000:5000'
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+  mongodb:
+    image: 'mongo:latest'
+    ports:
+      - '27018:27018'
+    command: 'mongod --smallfiles --logpath=/dev/null'
