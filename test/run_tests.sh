@@ -23,11 +23,13 @@ chmod +x test/visits-ip/run_test.sh
 chmod +x test/visits-filters/run_test.sh
 chmod +x test/resetTestEnv.sh
 
+docker build -t dgoldstein1/websiteanalytics-backend .
+
 # inject test data
 test/initTestEnv.sh
 
 # give the server and mongo a second to load
-sleep 1
+sleep 5
 
 # testing queries to / and /visits
 test/visits/run_test.sh ${1}
