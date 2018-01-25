@@ -68,8 +68,6 @@ curl "http://localhost:5000/visits?ip=123.456.789.1&to=-1&from=-365"
 
 ### Setup
 
-This go project uses `mongoDB` as a data store and `heroku` for deployment and configuration management.
-
 1. Download the project using go
 
 ```sh
@@ -82,26 +80,10 @@ cd $GOPATH/src/github.com/dgoldstein1/websiteAnalytics-backend
 go get
 ```
 
-2. Launch MongoDB instance
+2. Launch Using Docker
  
-To start a local instance of mongo, download and install the [command line interface](https://docs.mongodb.com/manual/installation/). Then run the following commands to get the db up and running locally:
-
-```sh
-mongod # start the service
-mongo  # in a new tab, connect and start mongo
-use websitevisits # create 'websitevists' db
 ```
-
-3.  Heroku 
-
-To setup heroku, follow [the heroku setup guide](https://devcenter.heroku.com/articles/getting-started-with-go#set-up) to install the cli. Then run the following:
-
-```sh
-heroku login
-# compile the go code
-go install 
-# start the dev server on port 5000
-heroku local
+docker-compose up -d
 ```
 
 The app should now be running on http://localhost:5000. Running `curl http://localhost:5000/visits` should give you `[]` as there are no current visits in the mongo db.

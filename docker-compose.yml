@@ -11,8 +11,6 @@ services:
       - mongodb
     depends_on:
       - mongodb
-    # volumes:
-    #   - '.:/go/src/github.com/dgoldstein1/websiteAnalytics-backend'
     ports:
       - '5000:5000'
   mongodb:
