@@ -108,52 +108,34 @@ The app should now be running on http://localhost:5000. Running `curl http://loc
 
 ### Testing
 
-Each endpoint is tested using a suite of integration tests. To run them, first start a dev server :
-
-```sh
-go install && heroku local
+```
+test/run_tests.sh 5000 
+# 5000 is the server port, tells the tests where to make their requests
 ```
 
-In a seperate terminal window from the root directory of the project, run the following :
+You should see the containers reload, and the result of the tests:
 
-```sh
-# from a new window
-test/run_tests.sh {port number} # port is usually 5000
-# output
-loading test data...
-{test data}
-done
+```
+--- downing containers... --- 
+--- done ---
+--- loading test data... ---
+--- done ---
+--- starting dev server ---
+Creating websiteanalyticsbackend_mongodb_1 ... done
+Creating websiteanalyticsbackend_mongodb_1 ... 
+Creating websiteanalyticsbackend_server_1  ... done
+--- done ---
 --- SUCCESS --- retrieve all visits
 --- SUCCESS --- add a new visit
+... other tests
+--- resetting environment.. ---
+Stopping websiteanalyticsbackend_server_1  ... done
+Stopping websiteanalyticsbackend_mongodb_1 ... done
+Removing websiteanalyticsbackend_server_1  ... done
+Removing websiteanalyticsbackend_mongodb_1 ... done
+Removing network websiteanalyticsbackend_default
+--- done ---
 ```
-
-Ro rerun tests, you must delete the test data from the 'websitevisits' db store. From your terminal run,
-
-```
-mongo
-MongoDB shell version v3.6.2
-connecting to: mongodb://127.0.0.1:27017
-MongoDB server version: 3.6.2
-Server has startup warnings: 
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] 
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] 
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] ** WARNING: This server is bound to localhost.
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          Remote systems will be unable to connect to this server. 
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          Start the server with --bind_ip <address> to specify which IP 
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          addresses it should serve responses from, or with --bind_ip_all to
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          bind to all interfaces. If this behavior is desired, start the
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          server with --bind_ip 127.0.0.1 to disable this warning.
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] 
-# you are now in the mongo cli
-> db.websitevisits.remove({})
-# delete all rows from db
-WriteResult({ "nRemoved" : 2 })
-```
-
-I'm working on better solution for this : https://github.com/dgoldstein1/websiteAnalytics-backend/issues/3
 
 ### Deployment
 

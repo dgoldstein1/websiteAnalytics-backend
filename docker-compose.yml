@@ -20,7 +20,7 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - ./data/db:/data/db
+      - ./docker/mongodb/data/db:/data/db
     environment:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null

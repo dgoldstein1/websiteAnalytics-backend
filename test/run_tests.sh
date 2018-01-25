@@ -16,16 +16,17 @@ log_success_or_failure() {
     fi
 }
 # add authorization to all test scripts
-chmod +x test/injectData.sh
+chmod +x test/initTestEnv.sh
 chmod +x test/visits/run_test.sh
 chmod +x test/visits-post/run_test.sh
 chmod +x test/visits-ip/run_test.sh
 chmod +x test/visits-filters/run_test.sh
+chmod +x test/resetTestEnv.sh
 
 # inject test data
-test/injectData.sh ${1}
+test/initTestEnv.sh
 
-# wait one second for the test data to load
+# give the server and mongo a second to load
 sleep 1
 
 # testing queries to / and /visits
@@ -43,3 +44,5 @@ log_success_or_failure "add a new visit"
 # # get by filter
 # test/visits-filters/run_test.sh ${1}
 # log_success_or_failure "filter by date"
+
+test/resetTestEnv.sh
