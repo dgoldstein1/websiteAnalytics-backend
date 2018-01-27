@@ -96,28 +96,7 @@ test/run_tests.sh 5000
 ```
 
 You should see the containers reload, and the result of the tests:
-
-```
---- downing containers... --- 
---- done ---
---- loading test data... ---
---- done ---
---- starting dev server ---
-Creating websiteanalyticsbackend_mongodb_1 ... done
-Creating websiteanalyticsbackend_mongodb_1 ... 
-Creating websiteanalyticsbackend_server_1  ... done
---- done ---
---- SUCCESS --- retrieve all visits
---- SUCCESS --- add a new visit
-... other tests
---- resetting environment.. ---
-Stopping websiteanalyticsbackend_server_1  ... done
-Stopping websiteanalyticsbackend_mongodb_1 ... done
-Removing websiteanalyticsbackend_server_1  ... done
-Removing websiteanalyticsbackend_mongodb_1 ... done
-Removing network websiteanalyticsbackend_default
---- done ---
-```
+![exampletest](test/example_test_run.png)
 
 ### Deployment
 

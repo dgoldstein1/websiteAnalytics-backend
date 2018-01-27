@@ -1106,7 +1106,6 @@ body .markdown-body
 </code></pre></p>
 <h1 id="development"><a name="user-content-development" href="#development" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Development</h1>
 <h3 id="setup"><a name="user-content-setup" href="#setup" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Setup</h3>
-<p>This go project uses <code>mongoDB</code> as a data store and <code>heroku</code> for deployment and configuration management.</p>
 <ol>
 <li>Download the project using go</li>
 </ol>
@@ -1120,67 +1119,19 @@ go get
 </code></pre>
 
 <ol>
-<li>Launch MongoDB instance</li>
+<li>Launch Using Docker</li>
 </ol>
-<p>To start a local instance of mongo, download and install the <a href="https://docs.mongodb.com/manual/installation/">command line interface</a>. Then run the following commands to get the db up and running locally:</p>
-<pre><code class="sh">mongod # start the service
-mongo  # in a new tab, connect and start mongo
-use websitevisits # create 'websitevists' db
-</code></pre>
-
-<ol>
-<li>Heroku </li>
-</ol>
-<p>To setup heroku, follow <a href="https://devcenter.heroku.com/articles/getting-started-with-go#set-up">the heroku setup guide</a> to install the cli. Then run the following:</p>
-<pre><code class="sh">heroku login
-# compile the go code
-go install 
-# start the dev server on port 5000
-heroku local
+<pre><code>docker-compose up -d
 </code></pre>
 
 <p>The app should now be running on <a href="http://localhost:5000">http://localhost:5000</a>. Running <code>curl http://localhost:5000/visits</code> should give you <code>[]</code> as there are no current visits in the mongo db.</p>
 <h3 id="testing"><a name="user-content-testing" href="#testing" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Testing</h3>
-<p>Each endpoint is tested using a suite of integration tests. To run them, first start a dev server :</p>
-<pre><code class="sh">go install &amp;&amp; heroku local
+<pre><code>test/run_tests.sh 5000 
+# 5000 is the server port, tells the tests where to make their requests
 </code></pre>
 
-<p>In a seperate terminal window from the root directory of the project, run the following :</p>
-<pre><code class="sh"># from a new window
-test/run_tests.sh {port number} # port is usually 5000
-# output
-loading test data...
-{test data}
-done
---- SUCCESS --- retrieve all visits
---- SUCCESS --- add a new visit
-</code></pre>
-
-<p>Ro rerun tests, you must delete the test data from the &lsquo;websitevisits&rsquo; db store. From your terminal run,</p>
-<pre><code>mongo
-MongoDB shell version v3.6.2
-connecting to: mongodb://127.0.0.1:27017
-MongoDB server version: 3.6.2
-Server has startup warnings: 
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] 
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] 
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] ** WARNING: This server is bound to localhost.
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          Remote systems will be unable to connect to this server. 
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          Start the server with --bind_ip &lt;address&gt; to specify which IP 
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          addresses it should serve responses from, or with --bind_ip_all to
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          bind to all interfaces. If this behavior is desired, start the
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] **          server with --bind_ip 127.0.0.1 to disable this warning.
-2018-01-13T15:11:27.036-0500 I CONTROL  [initandlisten] 
-# you are now in the mongo cli
-&gt; db.websitevisits.remove({})
-# delete all rows from db
-WriteResult({ &quot;nRemoved&quot; : 2 })
-</code></pre>
-
-<p>I&rsquo;m working on better solution for this : <a href="https://github.com/dgoldstein1/websiteAnalytics-backend/issues/3">https://github.com/dgoldstein1/websiteAnalytics-backend/issues/3</a></p>
+<p>You should see the containers reload, and the result of the tests:<br />
+<img alt="exampletest" src="/Users/davidgoldstein/go/src/github.com/dgoldstein1/websiteAnalytics-backend/test/example_test_run.png" /></p>
 <h3 id="deployment"><a name="user-content-deployment" href="#deployment" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Deployment</h3>
 <p>This project is continuously deployed with every push or merge to <code>master</code>.</p>
 <ol>

@@ -10,11 +10,12 @@
 log_success_or_failure() {
     if [ $? -eq 0 ]
     then
-        echo "--- SUCCESS --- ${1}"
+        echo "$(tput setab 2 )--- SUCCESS ---$(tput sgr0) ${1} "
     else
-        echo "--- FAILURE --- ${1}"
+        echo "$(tput setab 1 )--- FAILURE ---$(tput sgr0) ${1} "
     fi
 }
+
 # add authorization to all test scripts
 chmod +x test/initTestEnv.sh
 chmod +x test/visits/run_test.sh
@@ -23,14 +24,14 @@ chmod +x test/visits-ip/run_test.sh
 chmod +x test/visits-filters/run_test.sh
 chmod +x test/resetTestEnv.sh
 
-docker build -t dgoldstein1/websiteanalytics-backend .
-
 # inject test data
 test/initTestEnv.sh
 
 # give the server and mongo a second to load
+echo "$(tput bold) --- waiting for dev server to load ---$(tput sgr0)"
 sleep 5
 
+echo "$(tput bold) --- running tests ---$(tput sgr0)"
 # testing queries to / and /visits
 test/visits/run_test.sh ${1}
 log_success_or_failure "retrieve all visits"
