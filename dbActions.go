@@ -13,6 +13,7 @@ import (
     "gopkg.in/mgo.v2"
     "fmt"
     "os"
+    "labix.org/v2/mgo/bson"
 )
 
 var currId int
@@ -38,16 +39,37 @@ func connectToDb(uri string) bool {
 }
 
 /**
- * reads all rows
- * @param {string} ip filter
+ * creates mongodb query from filters
+ * @param {string} ip string filter
+ * @param {string} city filter
+ * @param {string} country code string filter
+ * @param {string} country name string filter
+ * @param {float64} latitude filter
+ * @param {float64} longitude filter 
+ * @param {int} metro code filter
+ * @param {string} region code filter
+ * @param {string} time zone (i.e 'America/New_York')
+ * @param {string} zipcode filter
+ *
+ * @return {bson.M{} bytes} {error}
+ **/
+func createQueryFromFilters(ip string, city string, country_code string, country_name string, latitudeFloat float64, longitudeFloat float64, metroCodeInt int, region_code string, time_zone string, zip_code string) (bson.M, error) {
+    // query := bson.M{}
+    // query["$and"] = []bson.M{}
+    // fmt.Println(reflect.TypeOf(query))
+    return nil, nil
+}
+
+/**
+ * reads all rows with filter
+ * @param {bson.M} query
  * @param {int} to date (0 = now)
  * @param {int} from date (-7 = ) seven days ago
  * @return {[]byte} array of visits
  **/
-func readAllRows(ip string, to int, from int) ([]byte, error) {
-    // TODO add to and from 
+func readAllRows(query bson.M, to int, from int) ([]byte, error) {
     visits := []Visit{}
-    err := collection.Find(nil).Sort("-visit_date").All(&visits)
+    err := collection.Find(query).Sort("-visit_date").All(&visits)
     if (err != nil) {
         return nil, err
     }
@@ -58,7 +80,7 @@ func readAllRows(ip string, to int, from int) ([]byte, error) {
 /**
  * adds an entry into the data
  * @param {json} visit to append to "visits" bucket
- * @return {json} visit, error
+ * @return {json} visit, {error} error
  **/
 func insertRow(visit Visit) (Visit, error) {
     if (testMode != "true") { // do not add date for test mode in order to have static data

@@ -20,27 +20,7 @@ curl -H \
  # Response : {"ipAddress": "123.456.789.1", "location": "TEST_LOCATION"}
 ```
 
-### /visits/ip/{ip} (UNDER CONSTRUCTION)
-
-| Endpoint        | Method         | Description |
-| :------------- | :-------------| :--------------------- |
-| /visits/ip/:ip | GET          | Gets visit by ip address|
-
-A quick way to get all the visits of by a specific IP address. Note that there is an added value Timestamp
-
-Example request:
-```sh
-curl "http://localhost:5000/visits/ip/123.456.789.1"
-# Response :
-# [
-#  {
-#    "Data": "{\"ipAddress\":\"123.456.789.1\",\"location\":\"TEST_LOCATION}",
-#    "Timestamp": "2017-12-27T14:08:28-06:00"
-#  }
-#]
-```
-
-### /visits (UNDER CONSTRUCTION)
+### /visits
 
 | Endpoint        | Method         | Description           | Query strings|
 | :------------- | :-------------| :---------------------  | :----- |

@@ -14,8 +14,8 @@ type Visit struct {
     City            string `form:"city" json:"city"`
     Country_Code    string `form:"country_code" json:"country_code"`
     Country_Name    string `form:"country_name" json:"country_name"`
-    Latitude        float32 `form:"latitude" json:"latitude"`
-    Longitude       float32 `form:"longitude" json:"longitude"`
+    Latitude        float64 `form:"latitude" json:"latitude"`
+    Longitude       float64 `form:"longitude" json:"longitude"`
     Metro_Code      int `form:"metro_code" json:"metro_code"`
     Region_Code     string `form:"region_code" json:"region_code"`
     Time_Zone       string `form:"time_zone" json:"time_zone"`
@@ -28,6 +28,7 @@ type Visit struct {
 const (
     NO_INPUT = "9223372036854775807"
     NO_INPUT_INT = 9223372036854775807
+    NO_INPUT_FLOAT = 9223372036854775807.0
 ) 
 
 func main() {
