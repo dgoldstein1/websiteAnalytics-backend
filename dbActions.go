@@ -54,10 +54,12 @@ func connectToDb(uri string) bool {
  * @return {bson.M{} bytes} {error}
  **/
 func createQueryFromFilters(ip string, city string, country_code string, country_name string, latitudeFloat float64, longitudeFloat float64, metroCodeInt int, region_code string, time_zone string, zip_code string) (bson.M, error) {
-    // query := bson.M{}
-    // query["$and"] = []bson.M{}
-    // fmt.Println(reflect.TypeOf(query))
-    return nil, nil
+    query := bson.M{}
+    query["$and"] = []bson.M{}
+    if (ip != NO_INPUT) {
+        query["$and"] = append(query["$and"].([]bson.M), bson.M{"ip": ip})
+    }
+    return query, nil
 }
 
 /**
