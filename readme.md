@@ -57,7 +57,7 @@ go get github.com/dgoldstein1/websiteAnalytics-backend
 # cd into directory
 cd $GOPATH/src/github.com/dgoldstein1/websiteAnalytics-backend
 # install dependencies
-go get
+govendor install
 ```
 
 2. Launch Using Docker

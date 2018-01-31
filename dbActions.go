@@ -3,17 +3,17 @@
 package main
 
 /**
- * Created by David Goldstein 12/2017 
+ * Created by David Goldstein 12/2017
  * manages interactions with mongo db
  **/
 
 import (
-    "time"
-    "encoding/json"
-    "gopkg.in/mgo.v2"
-    "fmt"
-    "os"
-    "labix.org/v2/mgo/bson"
+	"encoding/json"
+	"fmt"
+	"gopkg.in/mgo.v2"
+	"labix.org/v2/mgo/bson"
+	"os"
+	"time"
 )
 
 var currId int
@@ -26,16 +26,16 @@ var testMode string
  * @return {bool} success
  **/
 func connectToDb(uri string) bool {
-    testMode = os.Getenv("TEST_MODE")
-    sess, err := mgo.Dial(uri)
-    if (err != nil) {
-            fmt.Printf("Can't connect to mongo, go error %v\n", err)
-            return false;
-    }
-    sess.SetSafe(&mgo.Safe{})
-    // database = visits, collection = visits
-    collection = sess.DB("websitevisits").C("visits")
-    return true;
+	testMode = os.Getenv("TEST_MODE")
+	sess, err := mgo.Dial(uri)
+	if err != nil {
+		fmt.Printf("Can't connect to mongo, go error %v\n", err)
+		return false
+	}
+	sess.SetSafe(&mgo.Safe{})
+	// database = visits, collection = visits
+	collection = sess.DB("websitevisits").C("visits")
+	return true
 }
 
 /**
@@ -45,7 +45,7 @@ func connectToDb(uri string) bool {
  * @param {string} country code string filter
  * @param {string} country name string filter
  * @param {float64} latitude filter
- * @param {float64} longitude filter 
+ * @param {float64} longitude filter
  * @param {int} metro code filter
  * @param {string} region code filter
  * @param {string} time zone (i.e 'America/New_York')
@@ -54,12 +54,12 @@ func connectToDb(uri string) bool {
  * @return {bson.M{} bytes} {error}
  **/
 func createQueryFromFilters(ip string, city string, country_code string, country_name string, latitudeFloat float64, longitudeFloat float64, metroCodeInt int, region_code string, time_zone string, zip_code string) (bson.M, error) {
-    query := bson.M{}
-    query["$and"] = []bson.M{}
-    if (ip != NO_INPUT) {
-        query["$and"] = append(query["$and"].([]bson.M), bson.M{"ip": ip})
-    }
-    return query, nil
+	query := bson.M{}
+	query["$and"] = []bson.M{}
+	if ip != NO_INPUT {
+		query["$and"] = append(query["$and"].([]bson.M), bson.M{"ip": ip})
+	}
+	return query, nil
 }
 
 /**
@@ -70,13 +70,13 @@ func createQueryFromFilters(ip string, city string, country_code string, country
  * @return {[]byte} array of visits
  **/
 func readAllRows(query bson.M, to int, from int) ([]byte, error) {
-    visits := []Visit{}
-    err := collection.Find(query).Sort("-visit_date").All(&visits)
-    if (err != nil) {
-        return nil, err
-    }
-    // marshal data and return
-    return json.Marshal(visits)
+	visits := []Visit{}
+	err := collection.Find(query).Sort("-visit_date").All(&visits)
+	if err != nil {
+		return nil, err
+	}
+	// marshal data and return
+	return json.Marshal(visits)
 }
 
 /**
@@ -85,12 +85,12 @@ func readAllRows(query bson.M, to int, from int) ([]byte, error) {
  * @return {json} visit, {error} error
  **/
 func insertRow(visit Visit) (Visit, error) {
-    if (testMode != "true") { // do not add date for test mode in order to have static data
-        t := time.Now()
-        visit.Visit_Date = t
-    }
-    err := collection.Insert(visit)
-    return visit, err
+	if testMode != "true" { // do not add date for test mode in order to have static data
+		t := time.Now()
+		visit.Visit_Date = t
+	}
+	err := collection.Insert(visit)
+	return visit, err
 }
 
 /**
@@ -99,7 +99,7 @@ func insertRow(visit Visit) (Visit, error) {
  * @return {[]byte} array of visits
  **/
 func readByIp(ip string) ([]byte, error) {
-    // TODO
-    visits := []Visit{}
-    return json.Marshal(visits)
+	// TODO
+	visits := []Visit{}
+	return json.Marshal(visits)
 }

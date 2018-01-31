@@ -8,9 +8,9 @@ package main
  **/
 
 import (
-  "github.com/gin-gonic/gin"
-  "net/http"
-  "strconv"
+	"github.com/gin-gonic/gin"
+	"net/http"
+	"strconv"
 )
 
 //////////////
@@ -40,24 +40,24 @@ func getAllVisits(c *gin.Context) {
 	// cast values
 	fromInt, fromErr := strconv.Atoi(from)
 	toInt, toErr := strconv.Atoi(to)
-	latitudeFloat, latitudeErr :=  strconv.ParseFloat(latitude, 64)
+	latitudeFloat, latitudeErr := strconv.ParseFloat(latitude, 64)
 	longitudeFloat, longitudeErr := strconv.ParseFloat(longitude, 64)
 	metroCodeInt, metroCodeErr := strconv.Atoi(metro_code)
 
 	// validate inputs
-	if (latitudeErr != nil || longitudeErr != nil || metroCodeErr != nil) {
+	if latitudeErr != nil || longitudeErr != nil || metroCodeErr != nil {
 		c.String(http.StatusBadRequest, "Error parsing latitude, longitude, or metro_code")
-	} else if (fromErr != nil || toErr != nil) {
-		c.String(http.StatusBadRequest, "Bad input " + to + " " + from)
-	} else if (fromInt > toInt) {
-		c.String(http.StatusBadRequest, "The from date cannot be greater that the to date: input : " + to + " - " + from)
+	} else if fromErr != nil || toErr != nil {
+		c.String(http.StatusBadRequest, "Bad input "+to+" "+from)
+	} else if fromInt > toInt {
+		c.String(http.StatusBadRequest, "The from date cannot be greater that the to date: input : "+to+" - "+from)
 	} else { // input is good, read data
 		// convert params into query object
 		query, queryErr := createQueryFromFilters(ip, city, country_code, country_name, latitudeFloat, longitudeFloat, metroCodeInt, region_code, time_zone, zip_code)
-		if (queryErr == nil) { // query succesfully created
+		if queryErr == nil { // query succesfully created
 			// fetch from mongo and write results
 			values, err := readAllRows(query, toInt, fromInt)
-			if (err == nil) {
+			if err == nil {
 				c.String(http.StatusOK, string(values[:]))
 			} else {
 				c.String(500, err.Error())
@@ -75,11 +75,11 @@ func addVisit(c *gin.Context) {
 	var in Visit
 	if err := c.ShouldBindJSON(&in); err == nil {
 		out, insertErr := insertRow(in)
-		if (insertErr!=nil) {
-				c.String(500, insertErr.Error())
-			} else {
-				c.JSON(200, out)
-			}
+		if insertErr != nil {
+			c.String(500, insertErr.Error())
+		} else {
+			c.JSON(200, out)
+		}
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
@@ -91,11 +91,9 @@ func addVisit(c *gin.Context) {
 func showByIp(c *gin.Context) {
 	ip := c.Param("ip")
 	values, err := readByIp(ip)
-	if (err != nil) {
+	if err != nil {
 		c.String(500, err.Error())
 	} else {
 		c.String(http.StatusOK, string(values[:]))
 	}
 }
-
-
