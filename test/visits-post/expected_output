@@ -1,1 +1,1 @@
-{"ip":"TEST_IP_1","city":"TEST_CITY_1","country_code":"US","country_name":"United States","latitude":44.8547,"longitude":-93.7854,"metro_code":613,"region_code":"MN","time_zone":"America/Chicago","zip_code":"55387","visit_date":"0001-01-01T00:00:00Z"}
+{"ip":"TEST_IP_1","city":"TEST_CITY_1","country_code":"US","country_name":"United States","latitude":44.854698181152344,"longitude":-93.785400390625,"metro_code":613,"region_code":"MN","time_zone":"America/Chicago","zip_code":"55387","visit_date":"0001-01-01T00:00:00Z"}

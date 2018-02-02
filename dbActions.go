@@ -40,26 +40,18 @@ func connectToDb(uri string) bool {
 
 /**
  * creates mongodb query from filters
- * @param {string} ip string filter
- * @param {string} city filter
- * @param {string} country code string filter
- * @param {string} country name string filter
- * @param {float64} latitude filter
- * @param {float64} longitude filter
- * @param {int} metro code filter
- * @param {string} region code filter
- * @param {string} time zone (i.e 'America/New_York')
- * @param {string} zipcode filter
+ * @param {Visit} the parameters of Visit to filter against, without 'time'
  *
  * @return {bson.M{} bytes} {error}
  **/
-func createQueryFromFilters(ip string, city string, country_code string, country_name string, latitudeFloat float64, longitudeFloat float64, metroCodeInt int, region_code string, time_zone string, zip_code string) (bson.M, error) {
-	query := bson.M{}
-	query["$and"] = []bson.M{}
-	if ip != NO_INPUT {
-		query["$and"] = append(query["$and"].([]bson.M), bson.M{"ip": ip})
-	}
-	return query, nil
+func createQueryFromFilters(visitFilters Visit) (bson.M, error) {
+	// query := bson.M{}
+	// query["$and"] = []bson.M{}
+	// if ip != NO_INPUT {
+	// 	query["$and"] = append(query["$and"].([]bson.M), bson.M{"ip": ip})
+	// }
+	// return query, nil
+	return nil, nil
 }
 
 /**
@@ -69,7 +61,8 @@ func createQueryFromFilters(ip string, city string, country_code string, country
  * @param {int} from date (-7 = ) seven days ago
  * @return {[]byte} array of visits
  **/
-func readAllRows(query bson.M, to int, from int) ([]byte, error) {
+func readAllRows(visitFilters Visit, to int, from int) ([]byte, error) {
+	query, _ := createQueryFromFilters(visitFilters)
 	visits := []Visit{}
 	err := collection.Find(query).Sort("-visit_date").All(&visits)
 	if err != nil {

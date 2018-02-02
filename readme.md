@@ -71,7 +71,7 @@ The app should now be running on http://localhost:5000. Running `curl http://loc
 ### Testing
 
 ```
-test/run_tests.sh 5000 
+sudo est/run_tests.sh 5000 
 # 5000 is the server port, tells the tests where to make their requests
 ```
 

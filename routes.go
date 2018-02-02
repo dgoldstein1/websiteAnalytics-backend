@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 //////////////
@@ -53,17 +54,13 @@ func getAllVisits(c *gin.Context) {
 		c.String(http.StatusBadRequest, "The from date cannot be greater that the to date: input : "+to+" - "+from)
 	} else { // input is good, read data
 		// convert params into query object
-		query, queryErr := createQueryFromFilters(ip, city, country_code, country_name, latitudeFloat, longitudeFloat, metroCodeInt, region_code, time_zone, zip_code)
-		if queryErr == nil { // query succesfully created
-			// fetch from mongo and write results
-			values, err := readAllRows(query, toInt, fromInt)
-			if err == nil {
-				c.String(http.StatusOK, string(values[:]))
-			} else {
-				c.String(500, err.Error())
-			}
-		} else { // error creating the query
-			c.String(500, queryErr.Error())
+		visitFilters := Visit{ip, city, country_code, country_name, latitudeFloat, longitudeFloat, metroCodeInt, region_code, time_zone, zip_code, time.Now()}
+		// fetch from mongo and write results
+		values, err := readAllRows(visitFilters, toInt, fromInt)
+		if err == nil {
+			c.String(http.StatusOK, string(values[:]))
+		} else {
+			c.String(500, err.Error())
 		}
 	}
 }
