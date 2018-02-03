@@ -29,6 +29,9 @@ chmod +x test/visits-metro_code/run_test.sh
 chmod +x test/visits-region_code/run_test.sh
 chmod +x test/visits-time_zone/run_test.sh
 chmod +x test/visits-zip_code/run_test.sh
+chmod +x test/visits-query_type-and/run_test.sh
+chmod +x test/visits-query_type-or/run_test.sh
+chmod +x test/visits-query_type-nor/run_test.sh
 chmod +x test/resetTestEnv.sh
 
 # inject test data
@@ -70,6 +73,18 @@ log_success_or_failure "get visit by time_zone"
 # get by zip_code
 test/visits-zip_code/run_test.sh ${1}
 log_success_or_failure "get visit by zip_code"
+
+# query type is 'and'
+test/visits-query_type-and/run_test.sh ${1}
+log_success_or_failure "filter by query_type-and"
+
+# get by query_type-or
+test/visits-query_type-or/run_test.sh ${1}
+log_success_or_failure "filter by query_type-or"
+
+# get by query_type-nor
+test/visits-query_type-nor/run_test.sh ${1}
+log_success_or_failure "filter by query_type-nor"
 
 # post a new visit
 test/visits-post/run_test.sh ${1}

@@ -48,49 +48,49 @@ func connectToDb(uri string) bool {
 func createQueryFromFilters(visitFilters Visit, query_type string) (bson.M, error) {
 	// initialize bson object
 	query := bson.M{}
-	query["$and"] = []bson.M{}
+	query["$" + query_type] = []bson.M{}
 	// we need to keep track of if a value was added, if not, then we should return nil for the query
 	valueAdded := false
 
 	// go through each param in visit filters and add to query if not empty
 	if (visitFilters.Ip != NO_INPUT) {
-		query["$and"] = append(query["$and"].([]bson.M), bson.M{"ip": visitFilters.Ip})
+		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"ip": visitFilters.Ip})
 		valueAdded = true
 	}
 	if (visitFilters.City != NO_INPUT) { 
-		query["$and"] = append(query["$and"].([]bson.M), bson.M{"city": visitFilters.City})
+		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"city": visitFilters.City})
 		valueAdded = true
 	}
 	if (visitFilters.Country_Code != NO_INPUT) {
-		query["$and"] = append(query["$and"].([]bson.M), bson.M{"country_code": visitFilters.Country_Code})
+		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"country_code": visitFilters.Country_Code})
 		valueAdded = true
 	}
 	if (visitFilters.Country_Name != NO_INPUT) {
-		query["$and"] = append(query["$and"].([]bson.M), bson.M{"country_name": visitFilters.Country_Name})
+		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"country_name": visitFilters.Country_Name})
 		valueAdded = true
 	}
 	if (visitFilters.Latitude != NO_INPUT_FLOAT) {
-		query["$and"] = append(query["$and"].([]bson.M), bson.M{"latitude": visitFilters.Latitude})
+		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"latitude": visitFilters.Latitude})
 		valueAdded = true
 	}
 	if (visitFilters.Longitude != NO_INPUT_FLOAT) {
-		query["$and"] = append(query["$and"].([]bson.M), bson.M{"longitude": visitFilters.Longitude})
+		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"longitude": visitFilters.Longitude})
 		valueAdded = true
 	}
 	if (visitFilters.Metro_Code != NO_INPUT_INT) {
-		query["$and"] = append(query["$and"].([]bson.M), bson.M{"metro_code": visitFilters.Metro_Code})
+		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"metro_code": visitFilters.Metro_Code})
 		valueAdded = true
 	}
 	if (visitFilters.Region_Code != NO_INPUT) {
-		query["$and"] = append(query["$and"].([]bson.M), bson.M{"region_code": visitFilters.Region_Code})
+		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"region_code": visitFilters.Region_Code})
 		valueAdded = true
 	}
 	if (visitFilters.Time_Zone != NO_INPUT) {
-		query["$and"] = append(query["$and"].([]bson.M), bson.M{"time_zone": visitFilters.Time_Zone})
+		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"time_zone": visitFilters.Time_Zone})
 		valueAdded = true
 	}
 	if (visitFilters.Zip_Code != NO_INPUT) {
-		query["$and"] = append(query["$and"].([]bson.M), bson.M{"zip_code": visitFilters.Zip_Code})
+		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"zip_code": visitFilters.Zip_Code})
 		valueAdded = true
 	}
 
