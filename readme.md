@@ -22,27 +22,49 @@ curl -H \
 
 ### /visits
 
-| Endpoint        | Method         | Description           | Query strings|
-| :------------- | :-------------| :---------------------  | :----- |
-| /visits      | GET             | Lists all visits        | ip, to, from |
+| Endpoint        | Method         | Description           |
+| :------------- | :-------------| :---------------------  |
+| /visits      | GET             | Lists all visits        |
 
-Gets all visits, filterable by ip address and dates as query strings. Note that `to` and `from` are not inputed as dates, but rather negative integers which translate to the number of 'days ago', i.e. `-7` means 'seven days ago'.
+Gets all visits, filterable by the following query strings:
 
-Example Request: (all visits from `123.456.789.1` within the last year and yesterday)
-```sh
-curl "http://localhost:5000/visits?ip=123.456.789.1&to=-1&from=-365"
-# Response
-# [
-#  {
-#    "Data": "{\"ipAddress\":\"123.456.789.1\",\"location\":\"TEST_LOCATION}",
-#    "Timestamp": "2017-12-27T14:08:28-06:00"
-#  },
-#  {
-#    "Data": "{\"ipAddress\":\"123.456.789.1\",\"location\":\"TEST_LOCATION}",
-#    "Timestamp": "2017-10-27T14:08:28-06:00"
-#  }
-#]
+| Query String        | Example         | Description           |
+| :------------- | :-------------| :---------------------  |
+| ip      | /visits?ip=96.83.122.145             | List all visits of a specific ip        |
+| city      | /visits?city=Brooklyn             | List all visits of a specific city (case sensitive)        |
+| country_code      | /visits?country_code=US             | Lists all visits of a ISO-Alpha2 country code. See [list of country codes](http://www.nationsonline.org/oneworld/country_code_list.htm)       |
+| country_name      | /visits?country_name=Israel             | Lists all visits from a specific country       |
+| latitude      | /visits?latitude=38.818599700927734             | Lists all visits of a specific latitude        |
+| longitude      | /visits?longitude=-77.0625             | Lists all visits  of a specific longitude      |
+| metro_code      | /visits?metro_code=511             | Lists all visits by metro code (US only). See [list of metro codes](https://www2.census.gov/programs-surveys/cps/methodology/Geographic%20Coding%20-%20Metro%20Areas%20(since%20August%202005).pdf)       |
+| region_code      | /visits?region_code=VA             | Lists all visits by region (usually states in the US or city outside of US)        |
+| time_zone      | /visits?time_zone="America/New_York"             | Lists all visits by time zone. See [time zone list](https://timezonedb.com/time-zones)        |
+| zip_code      | /visits?zip_code=22301            | Lists all visits by zip code       |
+| query_tpe      | /visits?query_type='nor'    | Specifcies the logic type to filter by. Supported are 'and', 'or', 'nor', defaulting to 'and'        |
+
+Sample Query
+
 ```
+# query for anything which has both country code in US and latitude = 35 or neither
+curl "${dev endpoint}/visits?country_code=US&latitude=35&query_type=nor"
+# Respose
+[
+  {
+    "ip": "37.142.42.64",
+    "city": "Tel Aviv",
+    "country_code": "IL",
+    "country_name": "Israel",
+    "latitude": 32.06660079956055,
+    "longitude": 34.76499938964844,
+    "metro_code": 0,
+    "region_code": "TA",
+    "time_zone": "Asia/Jerusalem",
+    "zip_code": "",
+    "visit_date": "2018-01-25T16:48:44.192Z"
+  }
+]
+```
+
 
 # Development
 
@@ -171,7 +193,7 @@ Then run `heroku open` to open up the page in your browser. You should see an em
 
 ## Authors
 
-* **David Goldstein** - [DavidCharlesGoldstein.com](davidcharlesgoldstein.com) - [Decipher Technology Studios](deciphernow.com)
+* **David Goldstein** - [DavidCharlesGoldstein.com](http://www.davidcharlesgoldstein.com/) - [Decipher Technology Studios](http://deciphernow.com/)
 
 ## License
 
