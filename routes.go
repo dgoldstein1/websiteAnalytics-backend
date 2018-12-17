@@ -23,6 +23,7 @@ import (
  **/
 func getAllVisits(c *gin.Context) {
 	// property filters
+	href := c.DefaultQuery("href", NO_INPUT)
 	ip := c.DefaultQuery("ip", NO_INPUT)
 	city := c.DefaultQuery("city", NO_INPUT)
 	country_code := c.DefaultQuery("country_code", NO_INPUT)
@@ -59,7 +60,7 @@ func getAllVisits(c *gin.Context) {
 		c.String(http.StatusBadRequest, "The from date cannot be greater that the to date: input : "+to+" - "+from)
 	} else { // input is good, read data
 		// convert params into query object
-		visitFilters := Visit{ip, city, country_code, country_name, latitudeFloat, longitudeFloat, metroCodeInt, region_code, time_zone, zip_code, time.Now()}
+		visitFilters := Visit{href, ip, city, country_code, country_name, latitudeFloat, longitudeFloat, metroCodeInt, region_code, time_zone, zip_code, time.Now()}
 		// fetch from mongo and write results
 		values, err := readAllRows(visitFilters, toInt, fromInt, query_type)
 		if err == nil {

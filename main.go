@@ -10,6 +10,7 @@ import (
 
 // what a user uses to POST
 type Visit struct {
+	Href         string  `form:"href" json:"href"`
 	Ip           string  `form:"ip" json:"ip" binding:"required"`
 	City         string  `form:"city" json:"city"`
 	Country_Code string  `form:"country_code" json:"country_code"`
