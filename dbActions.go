@@ -54,7 +54,7 @@ func createQueryFromFilters(visitFilters Visit, query_type string) (bson.M, erro
 
 	// go through each param in visit filters and add to query if not empty
 	if (visitFilters.Href != NO_INPUT) {
-		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"ip": visitFilters.Href})
+		query["$" + query_type] = append(query["$" + query_type].([]bson.M), bson.M{"href": visitFilters.Href})
 		valueAdded = true
 	}
 	if (visitFilters.Ip != NO_INPUT) {
