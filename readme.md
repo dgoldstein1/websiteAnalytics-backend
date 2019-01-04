@@ -193,7 +193,7 @@ Then run `heroku open` to open up the page in your browser. You should see an em
 
 ## Authors
 
-* **David Goldstein** - [DavidCharlesGoldstein.com](http://www.davidcharlesgoldstein.com/) - [Decipher Technology Studios](http://deciphernow.com/)
+* **David Goldstein** - [DavidCharlesGoldstein.com](http://www.davidcharlesgoldstein.com/?github-website-analytics-backend) - [Decipher Technology Studios](http://deciphernow.com/)
 
 ## License
 
