@@ -34,7 +34,7 @@ func connectToDb(uri string) bool {
 	}
 	sess.SetSafe(&mgo.Safe{})
 	// database = visits, collection = visits
-	collection = sess.DB("websitevisits").C("visits")
+	collection = sess.DB(os.Getenv("DB_NAME")).C("visits")
 	return true
 }
 
