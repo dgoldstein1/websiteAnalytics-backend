@@ -127,24 +127,28 @@ func readAllRows(visitFilters Visit, to int, from int, query_type string) ([]Vis
 	// specify the Sort option to sort the returned documents by age in ascending order
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	opts := options.Find().SetSort(bson.D{{"visit_date", 1}})
-	cursor, err := collection.Find(ctx, query, opts)
+	// opts := options.Find().SetSort(bson.D{{"visit_date", 1}})
+	cur, err := collection.Find(ctx, query)
 	if err != nil {
+		fmt.Printf("Collection.Find(): %v\n", err)
 	    return visits, err
+	}
+	defer cur.Close(context.Background())
+	for cur.Next(context.Background()) {
+		v := Visit{}
+		err := cur.Decode(&v)
+		if err != nil {
+			fmt.Printf("cur.Decode(): %v\n", err)
+			return visits, err
+		}
+		// append to visits slice
+		visits = append(visits, v)
+	}
+	if err := cur.Err(); err != nil {
+		fmt.Printf("cur.Err() %v\n", err)
+		return visits, err
 	}
 
-	// get a list of all returned documents and print them out
-	// see the mongo.Cursor documentation for more examples of using cursors
-	var results []bson.M
-	if err = cursor.All(ctx, &results); err != nil {
-	    fmt.Printf("Could not read all rows, %v \n", err)
-	    return visits, err
-	}
-	for _, result := range results {
-		fmt.Println(result)
-	    // visits = append(result, visits)
-	}
-	// marshal data and return
 	return visits, nil
 }
 
