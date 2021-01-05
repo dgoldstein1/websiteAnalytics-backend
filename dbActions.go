@@ -10,11 +10,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/mgo.v2/bson"
 	"os"
 	"time"
 
 	"context"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -123,12 +123,10 @@ func readAllRows(visitFilters Visit, to int, from int, query_type string) ([]Vis
 	query, _ := createQueryFromFilters(visitFilters, query_type)
 	visits := []Visit{}
 
-	// find all documents in which the "name" field is "Bob"
-	// specify the Sort option to sort the returned documents by age in ascending order
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	// opts := options.Find().SetSort(bson.D{{"visit_date", 1}})
-	cur, err := collection.Find(ctx, query)
+	opts := options.Find().SetSort(bson.D{{"visit_date", 1}})
+	cur, err := collection.Find(ctx, query, opts)
 	if err != nil {
 		fmt.Printf("Collection.Find(): %v\n", err)
 		return visits, err
