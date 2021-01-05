@@ -17,6 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var currId int
@@ -29,13 +30,24 @@ var testMode string
  * @return {bool} success
  **/
 func connectToDb(uri string) bool {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
 		fmt.Printf("Cannot connect to mongo: %v\n", err)
 		return false
 	}
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			fmt.Printf("client.Disconnect(): %v\n", err)
+			panic(err)
+		}
+	}()
+	if err = client.Ping(ctx, readpref.Primary()); err != nil {
+		fmt.Printf("Ping: %v\n", err)
+		panic(err)
+	}
+
 	fmt.Println("CONNECTED")
 
 	testMode = os.Getenv("TEST_MODE")
