@@ -37,12 +37,6 @@ func connectToDb(uri string) bool {
 		fmt.Printf("Cannot connect to mongo: %v\n", err)
 		return false
 	}
-	defer func() {
-		if err = client.Disconnect(ctx); err != nil {
-			fmt.Printf("client.Disconnect(): %v\n", err)
-			panic(err)
-		}
-	}()
 	if err = client.Ping(ctx, readpref.Primary()); err != nil {
 		fmt.Printf("Ping: %v\n", err)
 		panic(err)
@@ -168,13 +162,14 @@ func readAllRows(visitFilters Visit, to int, from int, query_type string) ([]Vis
  * @return {json} visit, {error} error
  **/
 func insertRow(visit Visit) (Visit, error) {
-	return Visit{}, nil
-	// if testMode != "true" { // do not add date for test mode in order to have static data
-	// 	t := time.Now()
-	// 	visit.Visit_Date = t
-	// }
-	// err := collection.Insert(visit)
-	// return visit, err
+	if testMode != "true" { // do not add date for test mode in order to have static data
+		t := time.Now()
+		visit.Visit_Date = t
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	_, err := collection.InsertOne(ctx, visit)
+	return visit, err
 }
 
 /**
