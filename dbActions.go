@@ -35,7 +35,7 @@ func connectToDb(uri string) bool {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
 		fmt.Printf("Cannot connect to mongo: %v\n", err)
-		return false
+		panic(err)
 	}
 	if err = client.Ping(ctx, readpref.Primary()); err != nil {
 		fmt.Printf("Ping: %v\n", err)
@@ -131,7 +131,7 @@ func readAllRows(visitFilters Visit, to int, from int, query_type string) ([]Vis
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	opts := options.Find().SetSort(bson.D{{"visit_date", 1}})
+	opts := options.Find().SetSort(bson.D{{"visit_date", -1}})
 	cur, err := collection.Find(ctx, query, opts)
 	if err != nil {
 		fmt.Printf("Collection.Find(): %v\n", err)
