@@ -64,7 +64,7 @@ func getAllVisits(c *gin.Context) {
 		// fetch from mongo and write results
 		values, err := readAllRows(visitFilters, toInt, fromInt, query_type)
 		if err == nil {
-			c.String(http.StatusOK, string(values[:]))
+			c.JSON(http.StatusOK, values)
 		} else {
 			c.String(500, err.Error())
 		}

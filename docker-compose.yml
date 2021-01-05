@@ -5,7 +5,7 @@ services:
     environment:
       - LOGGER=true
       - TEST_MODE=true
-      - DATABASE_URL=mongodb://mongodb:27017
+      - DATABASE_URL=mongodb+srv://dbuser1:password1@cluster0.pknpw.mongodb.net/links-visits
       - PORT=5000
     links:
       - mongodb
@@ -14,12 +14,12 @@ services:
     ports:
       - '5000:5000'
   mongodb:
-    image: 'mongo:latest'
+    image: 'mongo:4.2.11'
     ports:
       - '27017:27017'
-    volumes:
-      - ./docker/mongodb/data/db:/data/db
-    environment:
-      - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
-    command: 'mongod --smallfiles --logpath=/dev/null'
+    # volumes:
+    #   - ./docker/mongodb/data/db:/data/db
+    # environment:
+    #   - MONGO_DATA_DIR=/data/db
+    #   - MONGO_LOG_DIR=/dev/null
+    # command: 'mongod --logpath=/dev/null'

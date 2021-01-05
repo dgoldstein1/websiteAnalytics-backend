@@ -10,14 +10,17 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"os"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "context"
 )
 
 var currId int
-var collection *mgo.Collection
+var collection *mongo.Collection
 var testMode string
 
 /**
@@ -26,15 +29,18 @@ var testMode string
  * @return {bool} success
  **/
 func connectToDb(uri string) bool {
-	testMode = os.Getenv("TEST_MODE")
-	sess, err := mgo.Dial(uri)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
-		fmt.Printf("Can't connect to mongo, go error %v\n", err)
+		fmt.Printf("Cannot connect to mongo: %v\n", err)
 		return false
 	}
-	sess.SetSafe(&mgo.Safe{})
+	fmt.Println("CONNECTED")
+
+	testMode = os.Getenv("TEST_MODE")
 	// database = visits, collection = visits
-	collection = sess.DB(os.Getenv("DB_NAME")).C("visits")
+	collection = client.Database(os.Getenv("DB_NAME")).Collection("visits")
 	return true
 }
 
@@ -113,15 +119,33 @@ func createQueryFromFilters(visitFilters Visit, query_type string) (bson.M, erro
  * @param {string} the type of query i.e. 'and' or 'or'
  * @return {[]byte} array of visits
  **/
-func readAllRows(visitFilters Visit, to int, from int, query_type string) ([]byte, error) {
+func readAllRows(visitFilters Visit, to int, from int, query_type string) ([]Visit, error) {
 	query, _ := createQueryFromFilters(visitFilters, query_type)
 	visits := []Visit{}
-	err := collection.Find(query).Sort("-visit_date").All(&visits)
+
+	// find all documents in which the "name" field is "Bob"
+	// specify the Sort option to sort the returned documents by age in ascending order
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	opts := options.Find().SetSort(bson.D{{"visit_date", 1}})
+	cursor, err := collection.Find(ctx, query, opts)
 	if err != nil {
-		return nil, err
+	    return visits, err
+	}
+
+	// get a list of all returned documents and print them out
+	// see the mongo.Cursor documentation for more examples of using cursors
+	var results []bson.M
+	if err = cursor.All(ctx, &results); err != nil {
+	    fmt.Printf("Could not read all rows, %v \n", err)
+	    return visits, err
+	}
+	for _, result := range results {
+		fmt.Println(result)
+	    // visits = append(result, visits)
 	}
 	// marshal data and return
-	return json.Marshal(visits)
+	return visits, nil
 }
 
 /**
@@ -130,12 +154,13 @@ func readAllRows(visitFilters Visit, to int, from int, query_type string) ([]byt
  * @return {json} visit, {error} error
  **/
 func insertRow(visit Visit) (Visit, error) {
-	if testMode != "true" { // do not add date for test mode in order to have static data
-		t := time.Now()
-		visit.Visit_Date = t
-	}
-	err := collection.Insert(visit)
-	return visit, err
+	return Visit{}, nil
+	// if testMode != "true" { // do not add date for test mode in order to have static data
+	// 	t := time.Now()
+	// 	visit.Visit_Date = t
+	// }
+	// err := collection.Insert(visit)
+	// return visit, err
 }
 
 /**
