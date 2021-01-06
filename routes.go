@@ -50,8 +50,8 @@ func getAllVisits(c *gin.Context) {
 	metroCodeInt, metroCodeErr := strconv.Atoi(metro_code)
 
 	// validate inputs
-	if (query_type != "and" && query_type != "or" && query_type != "nor") {
-		c.String(http.StatusBadRequest, "Cannot filter on " + query_type + ". Must be 'and' || 'or' || 'nor.")
+	if query_type != "and" && query_type != "or" && query_type != "nor" {
+		c.String(http.StatusBadRequest, "Cannot filter on "+query_type+". Must be 'and' || 'or' || 'nor.")
 	} else if latitudeErr != nil || longitudeErr != nil || metroCodeErr != nil {
 		c.String(http.StatusBadRequest, "Error parsing latitude, longitude, or metro_code")
 	} else if fromErr != nil || toErr != nil {
@@ -64,7 +64,7 @@ func getAllVisits(c *gin.Context) {
 		// fetch from mongo and write results
 		values, err := readAllRows(visitFilters, toInt, fromInt, query_type)
 		if err == nil {
-			c.String(http.StatusOK, string(values[:]))
+			c.JSON(http.StatusOK, values)
 		} else {
 			c.String(500, err.Error())
 		}
