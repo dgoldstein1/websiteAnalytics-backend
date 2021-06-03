@@ -15,9 +15,21 @@ Example Request:
 ```sh
 curl -H \
  "Content-Type: application/json" \
- -X POST -d '{"ipAddress": "123.456.789.1", "location": "TEST_LOCATION"}' \
+ -X POST -d '{
+    "ip": "37.142.42.64",
+    "city": "Tel Aviv",
+    "country_code": "IL",
+    "country_name": "Israel",
+    "latitude": 32.06660079956055,
+    "longitude": 34.76499938964844,
+    "metro_code": 0,
+    "region_code": "TA",
+    "time_zone": "Asia/Jerusalem",
+    "zip_code": ""
+  }' \
  "http://localhost:5000/visits"
- # Response : {"ipAddress": "123.456.789.1", "location": "TEST_LOCATION"}
+
+{"totalDocs":2,"visit":{"href":"","ip":"37.142.42.64","city":"Tel Aviv","country_code":"IL","country_name":"Israel","latitude":32.06660079956055,"longitude":34.76499938964844,"metro_code":0,"region_code":"TA","time_zone":"Asia/Jerusalem","zip_code":"","visit_date":"2021-06-03T14:42:10.652474-05:00"}}%
 ```
 
 ### /visits
