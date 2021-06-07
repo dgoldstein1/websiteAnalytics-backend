@@ -173,6 +173,21 @@ func insertRow(visit Visit) (Visit, error) {
 }
 
 /**
+ * gets total number of documents in db
+ **/
+func docCount() int64 {
+	opts := options.EstimatedDocumentCount().SetMaxTime(2 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	count, err := collection.EstimatedDocumentCount(ctx, opts)
+	if err != nil {
+		fmt.Printf("Could not get estimated number of documents: %v", err)
+		count = -1
+	}
+	return count
+}
+
+/**
  * retrieves all visits from a specific ip address
  * @param {string} ip address
  * @return {[]byte} array of visits

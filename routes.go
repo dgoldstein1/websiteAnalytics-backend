@@ -8,6 +8,7 @@ package main
  **/
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -77,11 +78,14 @@ func getAllVisits(c *gin.Context) {
 func addVisit(c *gin.Context) {
 	var in Visit
 	if err := c.ShouldBindJSON(&in); err == nil {
-		out, insertErr := insertRow(in)
+		visit, insertErr := insertRow(in)
 		if insertErr != nil {
-			c.String(500, insertErr.Error())
+			c.String(500, fmt.Sprintf("Could not insert doc: %v", insertErr.Error()))
 		} else {
-			c.JSON(200, out)
+			c.JSON(200, gin.H{
+				"visit":     visit,
+				"totalDocs": docCount(),
+			})
 		}
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
