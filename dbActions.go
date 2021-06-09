@@ -197,3 +197,9 @@ func readByIp(ip string) ([]byte, error) {
 	visits := []Visit{}
 	return json.Marshal(visits)
 }
+
+// goes through all entries filling in where latitude and longitude is 0
+// if cannot update, latitude and longitude is set to -1
+func updateAllEmptyEntries() error {
+	return nil
+}

@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -45,6 +46,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	// start background lookup if enabled
+	if os.Getenv("BACKGROUND_LOOKUP_ENABLED") == "true" {
+		go backgroundLookup()
+	}
+
 	// set up routing
 	router := gin.Default()
 	router.Use(gin.Logger())
@@ -64,4 +70,17 @@ func main() {
 
 	fmt.Println("Serving on port " + os.Getenv("PORT"))
 	http.ListenAndServe(":"+os.Getenv("PORT"), router)
+}
+
+// attempts to lookup empty entries
+func backgroundLookup() {
+	interval, err := strconv.Atoi(os.Getenv("BACKGROUND_LOOKUP_INTERVAL"))
+	if err != nil {
+		fmt.Printf("Could not convert BACKGROUND_LOOKUP_INTERVAL: %v", err)
+		os.Exit(1)
+	}
+	ticker := time.NewTicker(time.Duration(interval) * time.Second)
+	for range ticker.C {
+		fmt.Println("Tick")
+	}
 }
