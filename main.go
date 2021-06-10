@@ -81,6 +81,6 @@ func backgroundLookup() {
 	}
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 	for range ticker.C {
-		fmt.Println("Tick")
+
 	}
 }

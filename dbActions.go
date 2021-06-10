@@ -187,17 +187,6 @@ func docCount() int64 {
 	return count
 }
 
-/**
- * retrieves all visits from a specific ip address
- * @param {string} ip address
- * @return {[]byte} array of visits
- **/
-func readByIp(ip string) ([]byte, error) {
-	// TODO
-	visits := []Visit{}
-	return json.Marshal(visits)
-}
-
 // goes through all entries filling in where latitude and longitude is 0
 // if cannot update, latitude and longitude is set to -1
 func updateAllEmptyEntries() error {
