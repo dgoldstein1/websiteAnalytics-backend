@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -19,6 +20,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"io/ioutil"
 )
 
 var currId int
@@ -224,30 +226,54 @@ func updateAllEmptyEntries() error {
 			return fmt.Errorf("could not decode visit: %v, %v", v, err)
 		}
 		fmt.Printf("found visit to update: %v\n", v)
-		v, err = fetchGeoIP(v)
+		newVisit, err := fetchGeoIP(v)
 		if err != nil {
-			fmt.Printf("could not update visit %v", err)
+			fmt.Printf("could not get info for new visit %v", err)
 			continue
 		}
+		fmt.Println("found geoIP info for visit: %v", newVisit)
 		// success, update in database
-
+		if err = updateVisit(v.ID, newVisit); err != nil {
+			fmt.Printf("could not update visit %v", err)
+		}
 	}
 	return nil
+}
+
+// updates visit in store based on ID
+func updateVisit(id string, newVisit Visit) error {
+	opts := options.Update().SetUpsert(true)
+	filter := bson.D{{"_id", id}}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := collection.UpdateOne(ctx, filter, newVisit, opts)
+	return err
 }
 
 // fetchInfoFromIP fetches geoIP
 func fetchGeoIP(v Visit) (Visit, error) {
 	// http://api.ipstack.com/check\?access_key\=7eca814a6de384aab338e110c57fef37
-	url := "http://api.ipstack.com/" + v.Ip + "/access_key=" + os.Getenv("IP_STACK_ACCESS_KEY")
+	params := url.Values{}
+	params.Add("access_key", os.Getenv("IP_STACK_ACCESS_KEY"))
+	url := "http://api.ipstack.com/" + url.QueryEscape(v.Ip) + "/" + params.Encode()
 	fmt.Println("fetching IP: %s", url)
 	r, err := http.Get(url)
 	if err != nil {
 		return Visit{}, fmt.Errorf("could not fetch visit from %s: %v", url, v)
 	}
+	if r.StatusCode != http.StatusOK {
+		return Visit{}, fmt.Errorf("bad response code: %d\n", r.StatusCode)
+	}
+	newVisit := Visit{}
 	defer r.Body.Close()
-	err = json.NewDecoder(r.Body).Decode(&v)
+	bodyBytes, _ := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(bodyBytes, &newVisit)
 	if err != nil {
 		return Visit{}, fmt.Errorf("could not decode json to visit: %v", err)
 	}
-	return v, nil
+	if newVisit.Latitude == 0 {
+		return Visit{}, fmt.Errorf("could not fetch new lat/lon: %s\n", string(bodyBytes))
+	}
+	return newVisit, nil
 }
