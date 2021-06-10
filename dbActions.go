@@ -8,7 +8,6 @@ package main
  **/
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"time"
@@ -190,5 +189,30 @@ func docCount() int64 {
 // goes through all entries filling in where latitude and longitude is 0
 // if cannot update, latitude and longitude is set to -1
 func updateAllEmptyEntries() error {
+	// get all visits @0,0
+	visitFilters := Visit{
+		Href:         NO_INPUT,
+		Ip:           NO_INPUT,
+		City:         NO_INPUT,
+		Country_Code: NO_INPUT,
+		Country_Name: NO_INPUT,
+		Latitude:     0,
+		Longitude:    0,
+		Metro_Code:   NO_INPUT_INT,
+		Region_Code:  NO_INPUT,
+		Time_Zone:    NO_INPUT,
+		Zip_Code:     NO_INPUT,
+	}
+	query, err := createQueryFromFilters(visitFilters, "and")
+	if err != nil {
+		return fmt.Errorf("Could not createQueryFromFilters: %v", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cur, err := collection.Find(ctx, query, nil)
+	if err != nil {
+		return fmt.Errorf("Collection.Find(): %v\n", err)
+	}
+	defer cur.Close(context.Background())
 	return nil
 }

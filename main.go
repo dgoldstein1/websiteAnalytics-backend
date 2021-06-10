@@ -66,7 +66,6 @@ func main() {
 	// initialize REST routes
 	router.GET("/visits", getAllVisits)
 	router.POST("visits", addVisit)
-	router.GET("/visits/ip/:ip", showByIp)
 
 	fmt.Println("Serving on port " + os.Getenv("PORT"))
 	http.ListenAndServe(":"+os.Getenv("PORT"), router)
@@ -81,6 +80,11 @@ func backgroundLookup() {
 	}
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 	for range ticker.C {
-
+		fmt.Println("updating empty entires")
+		err := updateAllEmptyEntries()
+		if err != nil {
+			fmt.Printf("error updateAllEmptyEntries(): %v", err)
+			os.Exit(1)
+		}
 	}
 }
