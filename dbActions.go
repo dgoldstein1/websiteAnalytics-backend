@@ -8,7 +8,9 @@ package main
  **/
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -214,5 +216,38 @@ func updateAllEmptyEntries() error {
 		return fmt.Errorf("Collection.Find(): %v\n", err)
 	}
 	defer cur.Close(context.Background())
+	// go through each record and update
+	for cur.Next(context.Background()) {
+		v := Visit{}
+		err := cur.Decode(&v)
+		if err != nil {
+			return fmt.Errorf("could not decode visit: %v, %v", v, err)
+		}
+		fmt.Printf("found visit to update: %v\n", v)
+		v, err = fetchGeoIP(v)
+		if err != nil {
+			fmt.Printf("could not update visit %v", err)
+			continue
+		}
+		// success, update in database
+
+	}
 	return nil
+}
+
+// fetchInfoFromIP fetches geoIP
+func fetchGeoIP(v Visit) (Visit, error) {
+	// http://api.ipstack.com/check\?access_key\=7eca814a6de384aab338e110c57fef37
+	url := "http://api.ipstack.com/" + v.Ip + "/access_key=" + os.Getenv("IP_STACK_ACCESS_KEY")
+	fmt.Println("fetching IP: %s", url)
+	r, err := http.Get(url)
+	if err != nil {
+		return Visit{}, fmt.Errorf("could not fetch visit from %s: %v", url, v)
+	}
+	defer r.Body.Close()
+	err = json.NewDecoder(r.Body).Decode(&v)
+	if err != nil {
+		return Visit{}, fmt.Errorf("could not decode json to visit: %v", err)
+	}
+	return v, nil
 }

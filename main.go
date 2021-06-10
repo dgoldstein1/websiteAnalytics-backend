@@ -24,6 +24,7 @@ type Visit struct {
 	Zip_Code     string  `form:"zip_code" json:"zip_code"`
 	// added when inserted into db, passing this in POST does not do anything
 	Visit_Date time.Time `form:"visit_date" json:"visit_date"` // RFC3339 date string
+	ID         string    `bson:"_id"`                          // internal db usage only
 }
 
 // utilts -- use MAX_INT for nil as int
@@ -84,7 +85,6 @@ func backgroundLookup() {
 		err := updateAllEmptyEntries()
 		if err != nil {
 			fmt.Printf("error updateAllEmptyEntries(): %v", err)
-			os.Exit(1)
 		}
 	}
 }
