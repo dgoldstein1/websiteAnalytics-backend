@@ -4,7 +4,7 @@ services:
     image : dgoldstein1/websiteanalytics-backend
     environment:
       - LOGGER=true
-      - TEST_MODE=true
+      - TEST_MODE=false
       - DATABASE_URL=mongodb://mongodb:27017
       - DB_NAME=visits
       - PORT=5000

@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"context"
+	"github.com/davecgh/go-spew/spew"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -225,15 +226,15 @@ func updateAllEmptyEntries() error {
 		if err != nil {
 			return fmt.Errorf("could not decode visit: %v, %v", v, err)
 		}
-		fmt.Printf("found visit to update: %v\n", v)
+		fmt.Printf("found visit to update: %v\n", spew.Sdump(v))
 		newVisit, err := fetchGeoIP(v)
 		if err != nil {
 			fmt.Printf("could not get info for new visit %v", err)
 			continue
 		}
-		fmt.Println("found geoIP info for visit: %v", newVisit)
-		// success, update in database
-		if err = updateVisit(v.ID, newVisit); err != nil {
+		fmt.Printf("found geoIP info for visit: %v", newVisit)
+		// success, merge and update in database
+		if err = updateVisit(v.Ip, newVisit); err != nil {
 			fmt.Printf("could not update visit: %v", err)
 		}
 	}
@@ -241,18 +242,19 @@ func updateAllEmptyEntries() error {
 }
 
 // updates visit in store based on ID
-func updateVisit(id string, newVisit Visit) error {
+func updateVisit(ip string, newVisit Visit) error {
 	opts := options.Update().SetUpsert(true)
-	filter := bson.D{{"_id", id}}
-	fmt.Println("updating %v\n", filter)
+	filter := bson.D{{"ip", ip}}
+	fmt.Printf("updating visits where %v\n", filter)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err := collection.UpdateOne(ctx, filter, newVisit, opts)
+	result, err := collection.UpdateMany(ctx, filter, newVisit, opts)
+	fmt.Printf("updated docs: %v", spew.Sdump(result))
 	return err
 }
 
-// fetchInfoFromIP fetches geoIP
+// fetchInfoFromIP fetches geoIP and merges into object
 func fetchGeoIP(v Visit) (Visit, error) {
 	// http://api.ipstack.com/check\?access_key\=7eca814a6de384aab338e110c57fef37
 	params := url.Values{}
@@ -269,12 +271,19 @@ func fetchGeoIP(v Visit) (Visit, error) {
 	newVisit := Visit{}
 	defer r.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(r.Body)
+	fmt.Println(string(bodyBytes))
 	err = json.Unmarshal(bodyBytes, &newVisit)
 	if err != nil {
 		return Visit{}, fmt.Errorf("could not decode json to visit: %v", err)
 	}
+	if newVisit.Ip == "" {
+		return Visit{}, fmt.Errorf("could not convert bytes to Visit: %s\n", string(bodyBytes))
+	}
 	if newVisit.Latitude == 0 {
 		return Visit{}, fmt.Errorf("could not fetch new lat/lon: %s\n", string(bodyBytes))
 	}
+	// copy over non-ipstack properties
+	newVisit.Href = v.Href
+	newVisit.Visit_Date = v.Visit_Date
 	return newVisit, nil
 }
