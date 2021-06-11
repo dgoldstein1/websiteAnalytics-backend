@@ -234,7 +234,7 @@ func updateAllEmptyEntries() error {
 		fmt.Println("found geoIP info for visit: %v", newVisit)
 		// success, update in database
 		if err = updateVisit(v.ID, newVisit); err != nil {
-			fmt.Printf("could not update visit %v", err)
+			fmt.Printf("could not update visit: %v", err)
 		}
 	}
 	return nil
@@ -244,6 +244,7 @@ func updateAllEmptyEntries() error {
 func updateVisit(id string, newVisit Visit) error {
 	opts := options.Update().SetUpsert(true)
 	filter := bson.D{{"_id", id}}
+	fmt.Println("updating %v\n", filter)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -256,7 +257,7 @@ func fetchGeoIP(v Visit) (Visit, error) {
 	// http://api.ipstack.com/check\?access_key\=7eca814a6de384aab338e110c57fef37
 	params := url.Values{}
 	params.Add("access_key", os.Getenv("IP_STACK_ACCESS_KEY"))
-	url := "http://api.ipstack.com/" + url.QueryEscape(v.Ip) + "/" + params.Encode()
+	url := "http://api.ipstack.com/" + url.QueryEscape(v.Ip) + "?" + params.Encode()
 	fmt.Println("fetching IP: %s", url)
 	r, err := http.Get(url)
 	if err != nil {
