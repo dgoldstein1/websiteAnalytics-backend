@@ -91,16 +91,3 @@ func addVisit(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 }
-
-/**
- * writes list of all site visits
- **/
-func showByIp(c *gin.Context) {
-	ip := c.Param("ip")
-	values, err := readByIp(ip)
-	if err != nil {
-		c.String(500, err.Error())
-	} else {
-		c.String(http.StatusOK, string(values[:]))
-	}
-}

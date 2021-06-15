@@ -3,6 +3,7 @@ module github.com/dgoldstein1/websiteAnalytics-backend
 go 1.12
 
 require (
+	github.com/davecgh/go-spew v1.1.1
 	github.com/gin-contrib/sse v0.0.0-20170109093832-22d885f9ecc7 // indirect
 	github.com/gin-gonic/gin v0.0.0-20180126034611-783c7ee9c14e
 	github.com/golang/protobuf v1.0.0 // indirect

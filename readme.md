@@ -203,6 +203,12 @@ heroku logs
 
 Then run `heroku open` to open up the page in your browser. You should see an empty bracket or this readme page.
 
+## Background Lookup
+
+If `BACKGROUND_LOOKUP_ENABLED=true` then a background thread will attempt to lookup any entries using https://ipstack.com/documentation where `longitude` and `latitude` are `0`. Lookups are done on an interval `BACKGROUND_LOOKUP_INTERVAL`
+
+If a lookup fails then `latitude` and `longitude` will be set to `-1`. 
+
 ## Authors
 
 * **David Goldstein** - [DavidCharlesGoldstein.com](http://www.davidcharlesgoldstein.com/?github-website-analytics-backend) - [Decipher Technology Studios](http://deciphernow.com/)

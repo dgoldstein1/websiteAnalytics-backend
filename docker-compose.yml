@@ -4,9 +4,13 @@ services:
     image : dgoldstein1/websiteanalytics-backend
     environment:
       - LOGGER=true
-      - TEST_MODE=true
+      - TEST_MODE=false
       - DATABASE_URL=mongodb://mongodb:27017
+      - DB_NAME=visits
       - PORT=5000
+      - BACKGROUND_LOOKUP_ENABLED=true
+      - BACKGROUND_LOOKUP_INTERVAL=10 # ten seconds
+      - IP_STACK_ACCESS_KEY
     links:
       - mongodb
     depends_on:

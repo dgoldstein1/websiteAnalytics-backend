@@ -10,14 +10,18 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/url"
 	"os"
 	"time"
 
 	"context"
+	"github.com/davecgh/go-spew/spew"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"io/ioutil"
 )
 
 var currId int
@@ -187,13 +191,112 @@ func docCount() int64 {
 	return count
 }
 
-/**
- * retrieves all visits from a specific ip address
- * @param {string} ip address
- * @return {[]byte} array of visits
- **/
-func readByIp(ip string) ([]byte, error) {
-	// TODO
-	visits := []Visit{}
-	return json.Marshal(visits)
+// goes through all entries filling in where latitude and longitude is 0
+// if cannot update, latitude and longitude is set to -1
+func updateAllEmptyEntries() error {
+	// get all visits @0,0
+	visitFilters := Visit{
+		Href:         NO_INPUT,
+		Ip:           NO_INPUT,
+		City:         NO_INPUT,
+		Country_Code: NO_INPUT,
+		Country_Name: NO_INPUT,
+		Latitude:     0,
+		Longitude:    0,
+		Metro_Code:   NO_INPUT_INT,
+		Region_Code:  NO_INPUT,
+		Time_Zone:    NO_INPUT,
+		Zip_Code:     NO_INPUT,
+	}
+	query, err := createQueryFromFilters(visitFilters, "and")
+	if err != nil {
+		return fmt.Errorf("Could not createQueryFromFilters: %v", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cur, err := collection.Find(ctx, query, nil)
+	if err != nil {
+		return fmt.Errorf("Collection.Find(): %v\n", err)
+	}
+	defer cur.Close(context.Background())
+	// go through each record and update
+	for cur.Next(context.Background()) {
+		v := Visit{}
+		err := cur.Decode(&v)
+		if err != nil {
+			return fmt.Errorf("could not decode visit: %v, %v", v, err)
+		}
+		fmt.Printf("found visit to update: %v\n", spew.Sdump(v))
+		newVisit, err := fetchGeoIP(v)
+		if err != nil {
+			fmt.Printf("could not get info for new visit %v", err)
+			continue
+		}
+		fmt.Printf("found geoIP info for visit: %v", newVisit)
+		// success, merge and update in database
+		if err = updateVisit(v.Ip, newVisit); err != nil {
+			fmt.Printf("could not update visit: %v", err)
+		}
+	}
+	return nil
+}
+
+// updates visit in store based on IP
+func updateVisit(ip string, newVisit Visit) error {
+	opts := options.Update().SetUpsert(true)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	result, err := collection.UpdateMany(
+		ctx,
+		bson.M{"ip": ip},
+		bson.D{
+			{"$set", bson.D{{"latitude", newVisit.Latitude}}},
+			{"$set", bson.D{{"longitude", newVisit.Longitude}}},
+			{"$set", bson.D{{"country_code", newVisit.Country_Code}}},
+			{"$set", bson.D{{"country_name", newVisit.Country_Name}}},
+			{"$set", bson.D{{"city", newVisit.City}}},
+			{"$set", bson.D{{"metro_code", newVisit.Metro_Code}}},
+			{"$set", bson.D{{"region_code", newVisit.Region_Code}}},
+			{"$set", bson.D{{"time_zone", newVisit.Time_Zone}}},
+			{"$set", bson.D{{"zip_code", newVisit.Zip_Code}}},
+		},
+		opts,
+	)
+	fmt.Printf("updated docs: %v", spew.Sdump(result))
+	return err
+}
+
+// fetchInfoFromIP fetches geoIP and merges into object
+func fetchGeoIP(v Visit) (Visit, error) {
+	// http://api.ipstack.com/check\?access_key\=7eca814a6de384aab338e110c57fef37
+	params := url.Values{}
+	params.Add("access_key", os.Getenv("IP_STACK_ACCESS_KEY"))
+	url := "http://api.ipstack.com/" + url.QueryEscape(v.Ip) + "?" + params.Encode()
+	fmt.Println("fetching IP: %s", url)
+	r, err := http.Get(url)
+	if err != nil {
+		return Visit{}, fmt.Errorf("could not fetch visit from %s: %v", url, v)
+	}
+	if r.StatusCode != http.StatusOK {
+		return Visit{}, fmt.Errorf("bad response code: %d\n", r.StatusCode)
+	}
+	newVisit := Visit{}
+	defer r.Body.Close()
+	bodyBytes, _ := ioutil.ReadAll(r.Body)
+	fmt.Println(string(bodyBytes))
+	err = json.Unmarshal(bodyBytes, &newVisit)
+	if err != nil {
+		return Visit{}, fmt.Errorf("could not decode json to visit: %v", err)
+	}
+	if newVisit.Ip == "" {
+		return Visit{}, fmt.Errorf("could not convert bytes to Visit: %s\n", string(bodyBytes))
+	}
+	if newVisit.Latitude == 0 {
+		return Visit{}, fmt.Errorf("could not fetch new lat/lon: %s\n", string(bodyBytes))
+	}
+	// copy over non-ipstack properties
+	newVisit.Href = v.Href
+	newVisit.Visit_Date = v.Visit_Date
+	return newVisit, nil
 }
