@@ -80,7 +80,7 @@ func backgroundLookup() {
 	}
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 	for range ticker.C {
-		fmt.Println("updating empty entires")
+		fmt.Println("looking for empty entires")
 		err := updateAllEmptyEntries()
 		if err != nil {
 			fmt.Printf("error updateAllEmptyEntries(): %v", err)

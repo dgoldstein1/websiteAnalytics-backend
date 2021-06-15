@@ -241,15 +241,27 @@ func updateAllEmptyEntries() error {
 	return nil
 }
 
-// updates visit in store based on ID
+// updates visit in store based on IP
 func updateVisit(ip string, newVisit Visit) error {
 	opts := options.Update().SetUpsert(true)
-	filter := bson.D{{"ip", ip}}
-	fmt.Printf("updating visits where %v\n", filter)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	result, err := collection.UpdateMany(ctx, filter, newVisit, opts)
+	result, err := collection.UpdateMany(
+		ctx,
+		bson.M{"ip": ip},
+		bson.D{
+			{"$set", bson.D{{"latitude", newVisit.Latitude}}},
+			{"$set", bson.D{{"longitude", newVisit.Longitude}}},
+			{"$set", bson.D{{"country_code", newVisit.Country_Code}}},
+			{"$set", bson.D{{"country_name", newVisit.Country_Name}}},
+			{"$set", bson.D{{"city", newVisit.City}}},
+			{"$set", bson.D{{"metro_code", newVisit.Metro_Code}}},
+			{"$set", bson.D{{"time_zone", newVisit.Time_Zone}}},
+			{"$set", bson.D{{"zip_code", newVisit.Zip_Code}}},
+		},
+		opts,
+	)
 	fmt.Printf("updated docs: %v", spew.Sdump(result))
 	return err
 }
