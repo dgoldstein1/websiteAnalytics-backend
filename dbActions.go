@@ -257,6 +257,7 @@ func updateVisit(ip string, newVisit Visit) error {
 			{"$set", bson.D{{"country_name", newVisit.Country_Name}}},
 			{"$set", bson.D{{"city", newVisit.City}}},
 			{"$set", bson.D{{"metro_code", newVisit.Metro_Code}}},
+			{"$set", bson.D{{"region_code", newVisit.Region_Code}}},
 			{"$set", bson.D{{"time_zone", newVisit.Time_Zone}}},
 			{"$set", bson.D{{"zip_code", newVisit.Zip_Code}}},
 		},
