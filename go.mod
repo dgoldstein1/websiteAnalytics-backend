@@ -11,7 +11,7 @@ require (
 	github.com/json-iterator/go v0.0.0-20180128142709-bca911dae073 // indirect
 	github.com/mattn/go-isatty v0.0.4 // indirect
 	github.com/ugorji/go v0.0.0-20180131123904-105e48374b52 // indirect
-	go.mongodb.org/mongo-driver v1.4.4
+	go.mongodb.org/mongo-driver v1.5.1
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
 )
