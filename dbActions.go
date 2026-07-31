@@ -16,12 +16,13 @@ import (
 	"time"
 
 	"context"
+	"io"
+
 	"github.com/davecgh/go-spew/spew"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"io/ioutil"
 )
 
 var currId int
@@ -135,7 +136,7 @@ func readAllRows(visitFilters Visit, to int, from int, query_type string) ([]Vis
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	opts := options.Find().SetSort(bson.D{{"visit_date", -1}})
+	opts := options.Find().SetSort(bson.D{{Key: "visit_date", Value: -1}})
 	cur, err := collection.Find(ctx, query, opts)
 	if err != nil {
 		fmt.Printf("Collection.Find(): %v\n", err)
@@ -251,15 +252,17 @@ func updateVisit(ip string, newVisit Visit) error {
 		ctx,
 		bson.M{"ip": ip},
 		bson.D{
-			{"$set", bson.D{{"latitude", newVisit.Latitude}}},
-			{"$set", bson.D{{"longitude", newVisit.Longitude}}},
-			{"$set", bson.D{{"country_code", newVisit.Country_Code}}},
-			{"$set", bson.D{{"country_name", newVisit.Country_Name}}},
-			{"$set", bson.D{{"city", newVisit.City}}},
-			{"$set", bson.D{{"metro_code", newVisit.Metro_Code}}},
-			{"$set", bson.D{{"region_code", newVisit.Region_Code}}},
-			{"$set", bson.D{{"time_zone", newVisit.Time_Zone}}},
-			{"$set", bson.D{{"zip_code", newVisit.Zip_Code}}},
+			{Key: "$set", Value: bson.D{
+				{Key: "latitude", Value: newVisit.Latitude},
+				{Key: "longitude", Value: newVisit.Longitude},
+				{Key: "country_code", Value: newVisit.Country_Code},
+				{Key: "country_name", Value: newVisit.Country_Name},
+				{Key: "city", Value: newVisit.City},
+				{Key: "metro_code", Value: newVisit.Metro_Code},
+				{Key: "region_code", Value: newVisit.Region_Code},
+				{Key: "time_zone", Value: newVisit.Time_Zone},
+				{Key: "zip_code", Value: newVisit.Zip_Code},
+			}},
 		},
 		opts,
 	)
@@ -273,7 +276,7 @@ func fetchGeoIP(v Visit) (Visit, error) {
 	params := url.Values{}
 	params.Add("access_key", os.Getenv("IP_STACK_ACCESS_KEY"))
 	url := "http://api.ipstack.com/" + url.QueryEscape(v.Ip) + "?" + params.Encode()
-	fmt.Println("fetching IP: %s", url)
+	fmt.Printf("fetching IP: %s\n", url)
 	r, err := http.Get(url)
 	if err != nil {
 		return Visit{}, fmt.Errorf("could not fetch visit from %s: %v", url, v)
@@ -283,7 +286,7 @@ func fetchGeoIP(v Visit) (Visit, error) {
 	}
 	newVisit := Visit{}
 	defer r.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(r.Body)
+	bodyBytes, _ := io.ReadAll(r.Body)
 	fmt.Println(string(bodyBytes))
 	err = json.Unmarshal(bodyBytes, &newVisit)
 	if err != nil {
