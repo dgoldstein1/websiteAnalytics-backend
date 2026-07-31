@@ -44,7 +44,7 @@ jobs:
               docker push dgoldstein1/websiteanalyitcs-backend:$VERSION
               docker push dgoldstein1/websiteanalyitcs-backend:latest
 
-              docker login --username=$EMAIL --password=$HEROKU_API_KEY registry.heroku.com
+              docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
               docker tag dgoldstein1/websiteanalyitcs-backend:$VERSION registry.heroku.com/$HEROKU_APP_NAME/web
               docker push registry.heroku.com/$HEROKU_APP_NAME/web
 
