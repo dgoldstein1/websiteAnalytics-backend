@@ -1,10 +1,8 @@
 
 defaults: &defaults
   docker:
-    - image: circleci/golang:1.14
-  working_directory: /go/src/github.com/dgoldstein1/websiteanalyitcs-backend
-  environment:
-    GO111MODULE: "on"
+    - image: cimg/go:1.23
+  working_directory: /home/circleci/project
 
 version: 2
 jobs:
