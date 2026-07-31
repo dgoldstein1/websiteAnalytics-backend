@@ -1,3 +1,4 @@
 docker/mongodb/*
 websiteAnalytics-backend
 main
+vendor/

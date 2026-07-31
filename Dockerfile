@@ -1,10 +1,11 @@
+FROM golang:1.23
 
-# build stage
-FROM golang:latest 
-RUN mkdir -p /go/src/github.com/dgoldstein1/websiteAnalytics-backend 
-ADD . /go/src/github.com/dgoldstein1/websiteAnalytics-backend 
-WORKDIR /go/src/github.com/dgoldstein1/websiteAnalytics-backend 
-RUN go build -o main . 
+WORKDIR /app
 
-CMD ["/go/src/github.com/dgoldstein1/websiteAnalytics-backend/main"]
+COPY go.mod go.sum ./
+RUN go mod download
 
+COPY . .
+RUN go build -o main .
+
+CMD ["/app/main"]
