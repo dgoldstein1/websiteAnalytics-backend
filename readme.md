@@ -1,6 +1,6 @@
 # websiteAnalytics-backend
 
-A RESTful Go backend to track website visits. Each website visit contains a) the ip address of the user b) geographical information about that ip address (i.e. lat-lon, city, zipcode) and c) the date the user visited the website. The stack consists of a Go app deployed through heroku, and a [mongo db](www.mongodb.com) database. Heroku deployment is simple and mongo makes requests fast and gets rid of the need for additional querying through sql. 
+A RESTful Go backend to track website visits. Each website visit contains a) the ip address of the user b) geographical information about that ip address (i.e. lat-lon, city, zipcode) and c) the date the user visited the website. The stack consists of a Go app served via Docker, backed by a [mongo db](www.mongodb.com) database.
 
 # Routes
 
@@ -114,94 +114,7 @@ You should see the containers reload, and the result of the tests:
 
 ### Deployment
 
-This project is continuously deployed with every push or merge to `master`.
-
-1. Mongo
-
-To deploy a new instance, create a new mongo db on [https://mlab.com/](mongo lab) named 'websitevisits'. A free version is fine as this project does not consume a lot of memory. This will be the deployed app's datastore.
-
-2.  Heroku
-
-```sh
-heroku login
-# create new app on heroku
-heroku create
-Creating app... done, ⬢ thawing-inlet-61413
-https://thawing-inlet-61413.herokuapp.com/ | https://git.heroku.com/thawing-inlet-61413.git
-```
-
-This creates a new heroku app. Before we can deploy code to it, we need to update the configuration settings.
-
-3. Configure Environment Variables
-
-Open up the app configuration settings on the  [heroku dashboard](https://dashboard.heroku.com/apps) and set the following config variables :
-
-| Name        | Value         |
-| :------------- | :-------------|
-| DATABASE_URL      | mongodb://${dbuser}:${dbpassword}@ds255787.mlab.com:55787/${dbname}          |
-| LOGGER      | true              |
-| PORT      | 5000              |
-
-For `mongodb://<dbuser>:<dbpassword>@ds255787.mlab.com:55787/websitevisits` git this from `mongo lab` and replace `<dbuser>`, `<dbpassword>`, and `<dbname>` with the user you wish to access the db fromm and the db name. *Note -- these are the credentials from the `add database user` button on mlab*
-
-4. Deploy the app
-
-```sh
-# push the code to your remote
-git push heroku master
-Counting objects: 3, done.
-Delta compression using up to 8 threads.
-Compressing objects: 100% (3/3), done.
-Writing objects: 100% (3/3), 326 bytes | 0 bytes/s, done.
-Total 3 (delta 2), reused 0 (delta 0)
-remote: Compressing source files... done.
-remote: Building source:
-remote: 
-remote: -----> Go app detected
-remote: -----> Checking Godeps/Godeps.json file.
-remote: -----> Using go1.9.2
-remote:  !!    Installing package '.' (default)
-remote:  !!    
-remote: -----> Running: go install -v -tags heroku . 
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/github.com/gin-contrib/sse
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/github.com/gin-gonic/gin/json
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/github.com/golang/protobuf/proto
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/github.com/ugorji/go/codec
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/gopkg.in/go-playground/validator.v8
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/gopkg.in/yaml.v2
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/github.com/mattn/go-isatty
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/gopkg.in/mgo.v2/internal/json
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/gopkg.in/mgo.v2/bson
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/gopkg.in/mgo.v2/internal/scram
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/gopkg.in/mgo.v2
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/github.com/gin-gonic/gin/binding
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/github.com/gin-gonic/gin/render
-remote: github.com/dgoldstein1/websiteAnalytics-backend/vendor/github.com/gin-gonic/gin
-remote: github.com/dgoldstein1/websiteAnalytics-backend
-remote: -----> Discovering process types
-remote:        Procfile declares types -> web
-remote: 
-remote: -----> Compressing...
-remote:        Done: 5.7M
-remote: -----> Launching...
-remote:        Released v9
-remote:        https://quiet-brushlands-26130.herokuapp.com/ deployed to Heroku
-remote: 
-remote: Verifying deploy... done.
-To https://git.heroku.com/{your app name}.git
-   ad80626..2537239  master -> master
-
-# follow deployment from logs
-heroku logs
-...
-# build success
-2018-01-14T14:59:53.000000+00:00 app[api]: Build started by user {your username}
-2018-01-14T15:00:11.066497+00:00 app[api]: Deploy ad806265 by user {your username}
-2018-01-14T15:00:11.066497+00:00 app[api]: Release v8 created by user {your username}
-2018-01-14T14:59:53.000000+00:00 app[api]: Build succeeded
-```
-
-Then run `heroku open` to open up the page in your browser. You should see an empty bracket or this readme page.
+This project is continuously deployed with every push or merge to `master` via CircleCI, which builds and pushes the Docker image to Docker Hub.
 
 ## Background Lookup
 

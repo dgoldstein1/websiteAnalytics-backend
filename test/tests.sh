@@ -1,4 +1,3 @@
-# url=https://salty-sierra-82911.herokuapp.com/visits
 url=http://localhost:5000/visits
 
 echo "GET /VISTS"
